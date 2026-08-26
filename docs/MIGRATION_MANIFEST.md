@@ -1,0 +1,40 @@
+# Migration Manifest v0.25
+
+Total: 36
+
+- 001_core.sql
+- 002_rls.sql
+- 003_roles_modules_audit.sql
+- 004_membership_roles_context.sql
+- 005_plans_subscriptions_notifications.sql
+- 006_branch_constraints_platform_admin.sql
+- 007_core_role_seeds.sql
+- 008_rls_hardening.sql
+- 009_company_settings_role_mutations.sql
+- 010_branch_write_policies.sql
+- 011_settings_notifications_role_policies.sql
+- 012_company_invitations.sql
+- 013_accept_invitation.sql
+- 014_audit_and_indexes.sql
+- 015_entitlements.sql
+- 016_storage_rls.sql
+- 017_audit_immutability_and_invite_hardening.sql
+- 018_company_module_management.sql
+- 019_constraints_hardening.sql
+- 020_demo_security.sql
+- 021_rls_delete_and_audit.sql
+- 022_system_settings.sql
+- 023_audit_read_policy.sql
+- 024_notification_integrity.sql
+- 025_subscription_uniqueness.sql
+- 026_membership_uniqueness.sql
+- 027_platform_admin_hardening.sql
+- 028_platform_audit.sql
+- 029_onboarding_functions.sql
+- 030_trial_onboarding.sql
+- 031_onboarding_state.sql
+- 032_plan_enforcement.sql
+- 033_membership_lifecycle.sql
+- 034_invitation_enforcement.sql
+- 035_branch_limit_enforcement.sql
+- 036_invitation_acceptance.sql

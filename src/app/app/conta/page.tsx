@@ -1,0 +1,1 @@
+export default function Conta(){return <main className="container section"><b>FASE 3</b><h1 style={{fontSize:42}}>CONTA</h1><p className="sub">Módulo reservado para contabilidad y finanzas integradas.</p></main>}

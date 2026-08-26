@@ -1,0 +1,1 @@
+export function EmptyState({icon="◇",title,text,action}:{icon?:string;title:string;text:string;action?:React.ReactNode}){return <div className="premium-empty"><i>{icon}</i><h3>{title}</h3><p>{text}</p>{action}</div>}

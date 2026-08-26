@@ -1,0 +1,1 @@
+export function PremiumPageHeader({eyebrow,title,description,action}:{eyebrow:string,title:string,description?:string,action?:React.ReactNode}){return <div className="page-head"><div><span className="premium-kicker">{eyebrow}</span><h1>{title}</h1>{description&&<p className="sub">{description}</p>}</div>{action}</div>}

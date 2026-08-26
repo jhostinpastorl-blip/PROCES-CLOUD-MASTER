@@ -1,0 +1,2 @@
+"use server";import{z}from"zod";import{redirect}from"next/navigation";import{createClient}from"@/lib/supabase/server";import{hashToken}from"@/lib/security/token";
+export async function acceptInvitation(f:FormData){const raw=z.string().min(20).max(200).parse(f.get("token"));const s=await createClient();const{data,error}=await s.rpc("accept_company_invitation",{p_token_hash:hashToken(raw)});if(error)redirect("/aceptar-invitacion?error=invalid");redirect(`/app/dashboard?joined=${data}`)}

@@ -1,0 +1,1 @@
+"use server";import{z}from"zod";import{redirect}from"next/navigation";import{setActiveContext}from"@/lib/context/active";export async function selectContext(f:FormData){const companyId=z.string().uuid().parse(f.get("companyId"));const branch=String(f.get("branchId")||"");await setActiveContext(companyId,branch||undefined);redirect("/app/dashboard")}

@@ -1,0 +1,1 @@
+export function CapacityMeter({label,value,max}:{label:string;value:number;max:number|null}){const pct=max?Math.min(100,Math.round(value/max*100)):0;return <div className="capacity"><div><span>{label}</span><b>{value} / {max??"∞"}</b></div>{max&&<div className="capacity-track"><i style={{width:`${pct}%`}}/></div>}</div>}

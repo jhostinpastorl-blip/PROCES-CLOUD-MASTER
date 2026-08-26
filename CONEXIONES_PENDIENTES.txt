@@ -1,0 +1,7 @@
+PROCESA CLOUD — CONEXIONES PENDIENTES
+
+GITHUB: crear/conectar repo oficial; subir staging; proteger main; CI build/typecheck/tests; nunca secretos.
+SUPABASE: crear proyecto; configurar URL/anon key/secretos; ejecutar migraciones; validar RLS con dos empresas; backups antes de producción.
+GOOGLE DRIVE API: usar PROCESA CLOUD DATA; credenciales server-side; provider_object_id; PostgreSQL sigue siendo fuente de verdad.
+CLOUDFLARE: conectar dominio/DNS cuando staging esté listo; TLS, headers, rate limiting/WAF; evaluar Pages/Workers/R2 por costo.
+REGLA: no bloquear desarrollo por conexiones. El staging guardado en Drive es el paquete canónico temporal hasta GitHub.

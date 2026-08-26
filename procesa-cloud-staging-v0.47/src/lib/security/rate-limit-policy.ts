@@ -1,0 +1,1 @@
+export type RateLimitPolicy={windowSeconds:number;maxRequests:number};export const RATE_LIMIT_POLICIES={login:{windowSeconds:300,maxRequests:10},register:{windowSeconds:900,maxRequests:6},passwordReset:{windowSeconds:900,maxRequests:5},demo:{windowSeconds:3600,maxRequests:12},invitationAccept:{windowSeconds:900,maxRequests:20}} satisfies Record<string,RateLimitPolicy>;

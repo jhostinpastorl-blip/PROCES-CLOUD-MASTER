@@ -1,0 +1,1 @@
+import type{NextConfig}from"next";import{SECURITY_HEADERS}from"./src/lib/security/headers";import{contentSecurityPolicy}from"./src/lib/security/csp";const config:NextConfig={poweredByHeader:false,async headers(){return[{source:"/:path*",headers:[...SECURITY_HEADERS,{key:"Content-Security-Policy",value:contentSecurityPolicy()}]}]}};export default config;

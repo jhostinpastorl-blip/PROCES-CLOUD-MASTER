@@ -1,0 +1,1 @@
+export default function Flow(){return <main className="container section"><b>FASE 4</b><h1 style={{fontSize:42}}>FLOW</h1><p className="sub">Módulo reservado para procesos y automatización.</p></main>}

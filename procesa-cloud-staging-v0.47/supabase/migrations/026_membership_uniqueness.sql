@@ -1,0 +1,1 @@
+create unique index if not exists memberships_company_user_uq on public.company_memberships(company_id,user_id);create index if not exists membership_roles_role_idx on public.membership_roles(role_id,membership_id);

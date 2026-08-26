@@ -1,0 +1,1 @@
+import{redirectToOnboardingStep}from"@/lib/onboarding/redirect";export default async function Onboarding(){await redirectToOnboardingStep();return null}

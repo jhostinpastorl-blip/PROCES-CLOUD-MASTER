@@ -1,0 +1,17 @@
+{
+  "python scripts/secret_scan.py": {
+    "code": 0,
+    "stdout": "Secret scan PASS\n",
+    "stderr": "Spreadsheet runtime warmup failed during python startup\nTraceback (most recent call last):\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/patches/warm_spreadsheet_runtime_on_startup.py\", line 26, in warm_spreadsheet_runtime_on_startup\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py\", line 785, in warm_spreadsheet_runtime\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py\", line 720, in _warm_feature_f"
+  },
+  "python scripts/preflight.py": {
+    "code": 0,
+    "stdout": "{\n  \"status\": \"PASS\",\n  \"issues\": [],\n  \"migration_count\": 43\n}\n",
+    "stderr": "Spreadsheet runtime warmup failed during python startup\nTraceback (most recent call last):\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/patches/warm_spreadsheet_runtime_on_startup.py\", line 26, in warm_spreadsheet_runtime_on_startup\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py\", line 785, in warm_spreadsheet_runtime\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py\", line 720, in _warm_feature_f"
+  },
+  "python scripts/route_inventory.py": {
+    "code": 0,
+    "stdout": "route,auth_signal,permission_signal\n/aceptar-invitacion,yes,no\n/actualizar-contrasena,unknown,no\n/app/audit,yes,no\n/app/branches,unknown,no\n/app/company,unknown,no\n/app/conta,unknown,no\n/app/context,unknown,no\n/app/dashboard,unknown,no\n/app/docs,unknown,no\n/app/flow,unknown,no\n/app/modules,yes,no\n/app/notifications,yes,no\n/app/pos,unknown,no\n/app/rest,unknown,no\n/app/roles,unknown,no\n/app/security,yes,no\n/app/settings,yes,no\n/app/storage,yes,no\n/app/subscription,yes,no\n/app/users,unknown,no\n/app/viernes,unknown,no\n/demo,unknown,no\n/login,unknown,no\n/onboarding/branch,unknown,no\n/onboarding/company,unknown,no\n/onboarding/complete,unknown,no\n/onboarding/modules,unknown,no\n/onboarding,unknown,no\n/onboarding/plan,unknown,no\n/,unknown,no\n/procesa-admin/audit,yes,no\n/procesa-admin/companies,yes,no\n/procesa-admin/demo-requests,yes,no\n/procesa-admin/modules,yes,no\n/procesa-admin,yes,no\n/procesa-admin/plans,yes,no\n/recuperar-contrasena,unknown,no\n/registro,unknown,no\n",
+    "stderr": "Spreadsheet runtime warmup failed during python startup\nTraceback (most recent call last):\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/patches/warm_spreadsheet_runtime_on_startup.py\", line 26, in warm_spreadsheet_runtime_on_startup\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py\", line 785, in warm_spreadsheet_runtime\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py\", line 720, in _warm_feature_f"
+  }
+}

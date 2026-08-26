@@ -1,0 +1,1 @@
+export function PageShell({eyebrow,title,subtitle,action,children}:{eyebrow:string;title:string;subtitle:string;action?:React.ReactNode;children:React.ReactNode}){return <section className="premium-page"><div className="premium-page-head"><div><span>{eyebrow}</span><h2>{title}</h2><p>{subtitle}</p></div>{action&&<div>{action}</div>}</div>{children}</section>}

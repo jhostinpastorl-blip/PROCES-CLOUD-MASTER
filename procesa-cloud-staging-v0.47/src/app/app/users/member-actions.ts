@@ -1,0 +1,4 @@
+"use server";import{z}from"zod";import{revalidatePath}from"next/cache";import{createClient}from"@/lib/supabase/server";import{requirePermission}from"@/lib/auth/permissions";import{audit}from"@/lib/audit/log";
+async function mutate(f:FormData,action:"suspend_company_member"|"remove_company_member",auditAction:string){const companyId=z.string().uuid().parse(f.get("companyId"));const membershipId=z.string().uuid().parse(f.get("membershipId"));await requirePermission(companyId,"users.invite");const s=await createClient();const{error}=await s.rpc(action,{p_company_id:companyId,p_membership_id:membershipId});if(error)throw error;await audit(companyId,auditAction,"membership",membershipId);revalidatePath("/app/users")}
+export const suspendMember=(f:FormData)=>mutate(f,"suspend_company_member","membership.suspended");
+export const removeMember=(f:FormData)=>mutate(f,"remove_company_member","membership.removed");

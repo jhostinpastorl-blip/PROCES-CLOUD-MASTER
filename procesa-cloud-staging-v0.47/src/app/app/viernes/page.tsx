@@ -1,0 +1,1 @@
+export default function Viernes(){return <main className="container section"><h1 style={{fontSize:42}}>Viernes</h1><p className="sub">Asistente transversal reservado. Toda consulta deberá respetar empresa, sucursal, módulo, rol y permisos.</p></main>}

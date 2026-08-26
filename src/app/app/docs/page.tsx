@@ -1,0 +1,1 @@
+export default function Docs(){return <main className="container section"><h1 style={{fontSize:42}}>DOCS</h1><p className="sub">Módulo reservado para documentos y vencimientos.</p></main>}

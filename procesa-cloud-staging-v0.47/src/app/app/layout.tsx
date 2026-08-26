@@ -1,0 +1,3 @@
+import{ThemeToggle}from"@/components/ui/theme-toggle";
+import{MobileAppNav}from"@/components/ui/mobile-app-nav";
+import{redirect}from"next/navigation";import{getUser}from"@/lib/auth/context";import{DynamicSidebar}from"@/components/DynamicSidebar";import{AppTopbar}from"@/components/AppTopbar";import{TrialBanner}from"@/components/TrialBanner";export default async function AppLayout(<MobileAppNav/><ThemeToggle/>{children}:{children:React.ReactNode}){const user=await getUser();if(!user)redirect("/login");return <div className="app-layout"><DynamicSidebar/><div className="app-main"><AppTopbar/><TrialBanner/>{children}</div></div>}

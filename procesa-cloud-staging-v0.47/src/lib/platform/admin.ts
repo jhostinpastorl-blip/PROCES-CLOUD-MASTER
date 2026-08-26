@@ -1,0 +1,2 @@
+import{createClient}from"@/lib/supabase/server";import{redirect}from"next/navigation";
+export async function requirePlatformAdmin(){const s=await createClient();const{data:{user}}=await s.auth.getUser();if(!user)redirect("/login");const{data}=await s.from("platform_admins").select("user_id,is_active").eq("user_id",user.id).eq("is_active",true).maybeSingle();if(!data)redirect("/app/dashboard");return{user,s};}

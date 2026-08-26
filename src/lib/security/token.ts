@@ -1,0 +1,1 @@
+import{randomBytes,createHash}from"crypto";export function hashToken(raw:string){return createHash("sha256").update(raw).digest("hex")}export function invitationToken(){const raw=randomBytes(32).toString("base64url");return{raw,hash:hashToken(raw)}}

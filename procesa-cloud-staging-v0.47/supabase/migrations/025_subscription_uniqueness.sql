@@ -1,0 +1,1 @@
+create unique index if not exists subscriptions_one_current_per_company on public.subscriptions(company_id) where status in('trial','active','past_due');create index if not exists subscriptions_company_status_idx on public.subscriptions(company_id,status,created_at desc);

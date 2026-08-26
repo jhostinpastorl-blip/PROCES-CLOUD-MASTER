@@ -1,0 +1,1 @@
+export function PremiumEmptyState({title,description,action}:{title:string,description?:string,action?:React.ReactNode}){return <div className="empty-state"><div className="company-logo" style={{margin:"0 auto 14px"}}>PC</div><h3>{title}</h3>{description&&<p className="sub">{description}</p>}{action}</div>}

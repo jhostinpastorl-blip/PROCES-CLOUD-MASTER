@@ -1,0 +1,23 @@
+import{getCompanyContexts}from"@/lib/auth/context";
+import{createClient}from"@/lib/supabase/server";
+import{createBranch,toggleBranchStatus}from"./actions";
+import{EmptyState}from"@/components/ui/empty-state";
+import{StatusChip}from"@/components/ui/status-chip";
+export default async function Branches(){
+ const companies=await getCompanyContexts();const s=await createClient();
+ return <main className="app-content premium-real">
+  <div className="premium-page-head real-head"><div><span>ESTRUCTURA</span><h2>Sucursales</h2><p>Locales, almacenes y sedes organizados por empresa.</p></div></div>
+  {await Promise.all(companies.map(async c=>{
+   const{data}=await s.from("branches").select("id,name,code,is_active").eq("company_id",c.companyId).order("name");
+   const can=c.permissions.includes("branches.manage");const active=(data??[]).filter(x=>x.is_active).length;
+   return <section className="tenant-section" key={c.companyId}>
+    <div className="tenant-section-head"><div><span>EMPRESA</span><h3>{c.companyName}</h3><p>{active} activas · {data?.length??0} registradas</p></div>{can&&<StatusChip tone="info">Puedes administrar</StatusChip>}</div>
+    <div className="mini-kpis"><article><span>Total</span><b>{data?.length??0}</b><small>Registradas</small></article><article><span>Activas</span><b>{active}</b><small>Operativas</small></article><article><span>Permiso</span><b>{can?"Sí":"No"}</b><small>branches.manage</small></article></div>
+    <section className="table-card"><div className="table-card-head"><div><h3>Sucursales</h3><p>Código y estado operativo.</p></div></div>
+     {data?.length?<div className="premium-table"><div className="premium-tr head branch-real"><span>Sucursal</span><span>Código</span><span>Estado</span><span>Acciones</span></div>{data.map(b=><div className="premium-tr branch-real" key={b.id}><span><b>{b.name}</b><small>Sede empresarial</small></span><span>{b.code}</span><span><StatusChip tone={b.is_active?"success":"neutral"}>{b.is_active?"Activa":"Inactiva"}</StatusChip></span><span>{can?<form action={toggleBranchStatus}><input type="hidden" name="companyId" value={c.companyId}/><input type="hidden" name="branchId" value={b.id}/><input type="hidden" name="isActive" value={b.is_active?"false":"true"}/><button className="secondary-btn compact-btn">{b.is_active?"Desactivar":"Activar"}</button></form>:<span className="muted-action">—</span>}</span></div>)}</div>:<EmptyState title="Aún no hay sucursales" text="Crea la primera sede para organizar la operación de esta empresa."/>}
+    </section>
+    {can&&<section className="inline-create-card"><div><span>NUEVA SUCURSAL</span><h3>Añadir sede</h3><p>El límite del plan también se valida en backend.</p></div><form action={createBranch}><input type="hidden" name="companyId" value={c.companyId}/><label><span>Nombre</span><input name="name" placeholder="Ej. Principal" required/></label><label><span>Código</span><input name="code" placeholder="Ej. LIM-01" required/></label><button className="primary-btn">Crear sucursal</button></form></section>}
+   </section>
+  }))}
+ </main>
+}

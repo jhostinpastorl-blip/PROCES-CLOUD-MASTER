@@ -1,0 +1,1 @@
+import{RELEASE}from"@/lib/releases/version";export async function GET(){return Response.json({product:"PROCESA Cloud",...RELEASE,slogan:"El futuro se procesa hoy."},{headers:{"Cache-Control":"public, max-age=60"}})}

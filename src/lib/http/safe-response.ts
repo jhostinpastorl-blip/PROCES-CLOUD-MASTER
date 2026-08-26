@@ -1,0 +1,1 @@
+export function noStoreJson(data:unknown,status=200,extra:Record<string,string>={}){return Response.json(data,{status,headers:{"Cache-Control":"no-store","Pragma":"no-cache","X-Content-Type-Options":"nosniff",...extra}})}

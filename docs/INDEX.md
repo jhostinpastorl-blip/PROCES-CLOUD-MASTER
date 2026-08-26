@@ -1,0 +1,11 @@
+# PROCESA Cloud Documentation Index
+- WORK_ORDER_MASTER.md — mandatory execution order
+- CORE_RC0_DEFINITION.md — RC0 Definition of Done
+- CORE_RC0_SCORECARD.md — current gate status
+- SUPABASE_QA_RUNBOOK.md — QA deployment
+- RLS/security matrices — tests/security and tests/rc0
+- DRIVE_STORAGE_POLICY.md — Drive responsibilities
+- RELEASE_POLICY.md — versioning
+- SECRET_HANDLING.md — secrets
+- ERROR_HANDLING_POLICY.md — public/internal errors
+- OPERATIONS_READINESS.md — pilot readiness

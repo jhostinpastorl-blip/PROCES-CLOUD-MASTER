@@ -1,0 +1,1 @@
+export function StatusChip({tone="neutral",children}:{tone?:"success"|"warning"|"danger"|"neutral"|"info";children:React.ReactNode}){return <span className={`status-chip ${tone} pc-badge pc-badge-${tone} pc-badge-sm`}>{children}</span>}

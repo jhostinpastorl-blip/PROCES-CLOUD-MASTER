@@ -1,0 +1,1 @@
+export default function Rest(){return <main className="container section"><b>FASE 2</b><h1 style={{fontSize:42}}>REST</h1><p className="sub">Módulo reservado. Reutilizará productos, clientes, inventario y caja cuando corresponda.</p></main>}

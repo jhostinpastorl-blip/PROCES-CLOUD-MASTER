@@ -1,0 +1,11 @@
+# Checklist onboarding premium
+- Progreso visible.
+- Máximo una decisión principal por pantalla.
+- Plan explicado sin precio inventado.
+- Límites visibles.
+- Módulos según entitlement.
+- Empresa y sucursal configuradas.
+- Errores claros.
+- Responsive móvil.
+- Seguridad en backend.
+- Finalización con CTA único al producto.

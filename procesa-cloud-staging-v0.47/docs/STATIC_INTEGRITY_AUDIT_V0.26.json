@@ -1,0 +1,25 @@
+{
+  "version": "0.26.0",
+  "migration_count": 36,
+  "gaps": [],
+  "duplicates": [],
+  "missing_required": [],
+  "risk_hits": [
+    {
+      "file": "docs/CORE_HARDENING_V0.23.md",
+      "type": "TODO/FIXME"
+    },
+    {
+      "file": "tests/security/attack-cases.md",
+      "type": "TODO/FIXME"
+    },
+    {
+      "file": "src/app/page.tsx",
+      "type": "TODO/FIXME"
+    },
+    {
+      "file": "src/app/onboarding/complete/page.tsx",
+      "type": "TODO/FIXME"
+    }
+  ]
+}

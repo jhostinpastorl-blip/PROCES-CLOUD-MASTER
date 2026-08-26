@@ -1,0 +1,1 @@
+import{serverEnv}from"@/lib/env/server";export async function GET(){try{serverEnv();return Response.json({status:"ok",configuration:"valid"},{headers:{"Cache-Control":"no-store"}})}catch{return Response.json({status:"invalid_configuration"},{status:503,headers:{"Cache-Control":"no-store"}})}}

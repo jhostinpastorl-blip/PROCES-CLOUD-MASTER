@@ -1,0 +1,1 @@
+const FORBIDDEN_CLIENT_KEYS=["SUPABASE_SERVICE_ROLE_KEY","GOOGLE_PRIVATE_KEY","GOOGLE_CLIENT_SECRET","DATABASE_URL"];export function assertNoServerSecretInPublicEnv(){for(const key of FORBIDDEN_CLIENT_KEYS){if(process.env[`NEXT_PUBLIC_${key}`])throw new Error(`SERVER_SECRET_EXPOSED:${key}`)}}

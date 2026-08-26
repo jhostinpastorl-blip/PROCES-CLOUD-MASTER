@@ -1,0 +1,1 @@
+import{correlationId}from"@/lib/observability/correlation";import{RELEASE}from"@/lib/releases/version";export async function GET(){const id=await correlationId();return Response.json({status:"ok",product:"PROCESA Cloud",release:RELEASE.version,phase:RELEASE.phase,correlation_id:id,timestamp:new Date().toISOString()},{headers:{"Cache-Control":"no-store","X-Correlation-Id":id}})}

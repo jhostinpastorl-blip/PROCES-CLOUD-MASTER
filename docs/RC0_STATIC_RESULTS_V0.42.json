@@ -1,0 +1,37 @@
+{
+  "python scripts/secret_scan.py": {
+    "code": 0,
+    "stdout": "Secret scan PASS\n",
+    "stderr": "dsheet_warmup.py\", line 704, in _warm_collaboration_flows\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/generated/interface/models.py\", line 32317, in hydrate_crdt_from_proto\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/remote.py\", line 749, in __call__\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/client.py\", line 150, in call\nartifact_tool.rpc.client.RemoteError: hydrateCrdtFromProto requires an empty collaborative document.\n"
+  },
+  "python scripts/preflight.py": {
+    "code": 0,
+    "stdout": "{\n  \"status\": \"PASS\",\n  \"issues\": [],\n  \"migration_count\": 49\n}\n",
+    "stderr": "dsheet_warmup.py\", line 704, in _warm_collaboration_flows\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/generated/interface/models.py\", line 32317, in hydrate_crdt_from_proto\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/remote.py\", line 749, in __call__\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/client.py\", line 150, in call\nartifact_tool.rpc.client.RemoteError: hydrateCrdtFromProto requires an empty collaborative document.\n"
+  },
+  "python scripts/check_imports.py": {
+    "code": 0,
+    "stdout": "Import check PASS\n",
+    "stderr": "dsheet_warmup.py\", line 704, in _warm_collaboration_flows\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/generated/interface/models.py\", line 32317, in hydrate_crdt_from_proto\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/remote.py\", line 749, in __call__\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/client.py\", line 150, in call\nartifact_tool.rpc.client.RemoteError: hydrateCrdtFromProto requires an empty collaborative document.\n"
+  },
+  "python scripts/check_permissions.py": {
+    "code": 0,
+    "stdout": "Known permissions: 16\nUsed permissions: 8\nPermission catalog PASS\n",
+    "stderr": "dsheet_warmup.py\", line 704, in _warm_collaboration_flows\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/generated/interface/models.py\", line 32317, in hydrate_crdt_from_proto\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/remote.py\", line 749, in __call__\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/client.py\", line 150, in call\nartifact_tool.rpc.client.RemoteError: hydrateCrdtFromProto requires an empty collaborative document.\n"
+  },
+  "python scripts/check_form_schemas.py": {
+    "code": 0,
+    "stdout": "Form schema adoption WARN\n- src/app/demo/actions.ts\n- src/app/recuperar-contrasena/actions.ts\n- src/app/app/users/actions.ts\n- src/app/app/roles/actions.ts\n- src/app/app/settings/actions.ts\n- src/app/app/branches/actions.ts\nLegacy validations remain; review before RC0.\n",
+    "stderr": "  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py\", line 772, in warm_spreadsheet_runtime\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/connection.py\", line 37, in get_or_create_client\n  File \"/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/daemon.py\", line 124, in start_daemon\nTimeoutError: Timed out waiting for artifact tool daemon socket. Set ARTIFACT_TOOL_RPC_DAEMON_STARTUP_TIMEOUT_S=<seconds> to increase the limit.\n"
+  },
+  "node scripts/verify-project.mjs": {
+    "code": 0,
+    "stdout": "Verified 49 migrations and project structure.\n",
+    "stderr": ""
+  },
+  "node scripts/check-tenant-sql.mjs": {
+    "code": 0,
+    "stdout": "Tenant SQL static scan complete.\n",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,1 @@
+"use server";import{redirect}from"next/navigation";import{createClient}from"@/lib/supabase/server";export async function logout(){const s=await createClient();await s.auth.signOut({scope:"local"});redirect("/login")}export async function logoutEverywhere(){const s=await createClient();await s.auth.signOut({scope:"global"});redirect("/login?all_sessions_closed=1")}

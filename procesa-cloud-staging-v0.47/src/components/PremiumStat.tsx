@@ -1,0 +1,1 @@
+export function PremiumStat({label,value,caption}:{label:string,value:string|number,caption?:string}){return <div className="stat-card"><span>{label}</span><strong>{value}</strong>{caption&&<small>{caption}</small>}</div>}

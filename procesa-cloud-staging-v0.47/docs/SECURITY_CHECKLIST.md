@@ -1,0 +1,14 @@
+# Security checklist — Core v0.5
+- [x] Auth server-side para área /app.
+- [x] company_id validado contra membresía.
+- [x] permisos efectivos calculados desde roles.
+- [x] Super Admin separado mediante platform_admins.
+- [x] RLS en tablas empresariales principales.
+- [x] secretos excluidos del código mediante variables de entorno.
+- [x] recuperación de contraseña.
+- [x] auditoría helper para mutaciones críticas.
+- [ ] Rate limiting en login y demo (Cloudflare/backend al conectar).
+- [ ] Pruebas automatizadas con Supabase real.
+- [ ] MFA opcional.
+- [ ] políticas INSERT/UPDATE/DELETE revisadas por cada recurso.
+- [ ] invitaciones server-side con service role sin exposición al cliente.

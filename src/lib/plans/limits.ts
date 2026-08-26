@@ -1,0 +1,5 @@
+import{createClient}from"@/lib/supabase/server";
+export async function getCompanyLimits(companyId:string){const s=await createClient();const{data,error}=await s.from("subscriptions").select("status,plans(code,name,max_users,max_branches,features)").eq("company_id",companyId).in("status",["trial","active"]).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;return data}
+async function limit(companyId:string,key:"max_users"|"max_branches",table:string,filters:Record<string,unknown>={}){const s=await createClient();const sub=await getCompanyLimits(companyId);const max=(sub?.plans as any)?.[key]??null;if(max===null)return;let q=s.from(table).select("id",{count:"exact",head:true}).eq("company_id",companyId);for(const[k,v]of Object.entries(filters))q=q.eq(k,v as any);const{count,error}=await q;if(error)throw error;if((count??0)>=max)throw new Error(key==="max_users"?"PLAN_USER_LIMIT":"PLAN_BRANCH_LIMIT")}
+export const assertBranchLimit=(id:string)=>limit(id,"max_branches","branches",{is_active:true});
+export const assertUserLimit=(id:string)=>limit(id,"max_users","company_memberships",{status:"active"});

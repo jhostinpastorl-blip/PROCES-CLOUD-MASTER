@@ -1,0 +1,1 @@
+import Link from "next/link";export function PublicNav(){return <header><div className="container nav"><Link href="/" className="brand">PROCESA Cloud</Link><nav className="links"><a href="/#modulos">Módulos</a><a href="/#como-funciona">Cómo funciona</a><Link href="/login">Iniciar sesión</Link><Link className="btn primary" href="/demo">Solicitar demo</Link></nav></div></header>}

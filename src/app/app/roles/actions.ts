@@ -1,0 +1,114 @@
+﻿"use server";
+
+import { z } from "zod";
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/permissions";
+import { audit } from "@/lib/audit/log";
+
+const roleSchema = z.object({
+  companyId: z.string().uuid(),
+  name: z.string().min(2).max(80),
+});
+
+export async function createRole(f: FormData) {
+  const p = roleSchema.parse(Object.fromEntries(f));
+  await requirePermission(p.companyId, "roles.manage");
+  const s = await createClient();
+  const { data, error } = await s
+    .from("roles")
+    .insert({ company_id: p.companyId, name: p.name, is_system: false })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  await audit(p.companyId, "role.created", "role", data.id, { name: p.name });
+  revalidatePath("/app/roles");
+}
+
+export async function assignPermission(f: FormData) {
+  const companyId = z.string().uuid().parse(f.get("companyId"));
+  const roleId = z.string().uuid().parse(f.get("roleId"));
+  const permissionId = z.string().uuid().parse(f.get("permissionId"));
+  await requirePermission(companyId, "roles.manage");
+  const s = await createClient();
+
+  const { data: role } = await s
+    .from("roles")
+    .select("id")
+    .eq("id", roleId)
+    .eq("company_id", companyId)
+    .single();
+
+  if (!role) throw new Error("ROLE_NOT_IN_COMPANY");
+
+  const { error } = await s
+    .from("role_permissions")
+    .upsert({ role_id: roleId, permission_id: permissionId });
+
+  if (error) throw error;
+  await audit(companyId, "role.permission.assigned", "role", roleId, { permissionId });
+  revalidatePath("/app/roles");
+}
+
+export async function revokePermissionFromRole(f: FormData) {
+  const companyId = z.string().uuid().parse(f.get("companyId"));
+  const roleId = z.string().uuid().parse(f.get("roleId"));
+  const permissionId = z.string().uuid().parse(f.get("permissionId"));
+  await requirePermission(companyId, "roles.manage");
+  const s = await createClient();
+
+  const { data: role } = await s
+    .from("roles")
+    .select("id")
+    .eq("id", roleId)
+    .eq("company_id", companyId)
+    .single();
+
+  if (!role) throw new Error("ROLE_NOT_IN_COMPANY");
+
+  const { error } = await s
+    .from("role_permissions")
+    .delete()
+    .eq("role_id", roleId)
+    .eq("permission_id", permissionId);
+
+  if (error) throw error;
+  await audit(companyId, "role.permission.revoked", "role", roleId, { permissionId });
+  revalidatePath("/app/roles");
+}
+
+export async function assignRoleToMember(f: FormData) {
+  const companyId = z.string().uuid().parse(f.get("companyId"));
+  const membershipId = z.string().uuid().parse(f.get("membershipId"));
+  const roleId = z.string().uuid().parse(f.get("roleId"));
+
+  await requirePermission(companyId, "roles.manage");
+  const s = await createClient();
+
+  const { data: role } = await s
+    .from("roles")
+    .select("id")
+    .eq("id", roleId)
+    .eq("company_id", companyId)
+    .single();
+  if (!role) throw new Error("ROLE_NOT_IN_COMPANY");
+
+  const { data: member } = await s
+    .from("company_memberships")
+    .select("id")
+    .eq("id", membershipId)
+    .eq("company_id", companyId)
+    .single();
+  if (!member) throw new Error("MEMBER_NOT_IN_COMPANY");
+
+  const { error } = await s
+    .from("membership_roles")
+    .insert({ membership_id: membershipId, role_id: roleId });
+
+  if (error && !error.message?.includes("duplicate")) throw error;
+
+  await audit(companyId, "member.role.assigned", "membership", membershipId, { roleId });
+  revalidatePath("/app/users");
+  revalidatePath("/app/roles");
+}

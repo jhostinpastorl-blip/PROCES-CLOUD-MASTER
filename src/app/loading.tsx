@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="global-state-page" aria-live="polite" aria-busy="true"><div className="global-state-card"><div className="state-spinner" aria-hidden="true"/><span>PROCESA CLOUD</span><h1>Cargando tu espacio…</h1><p>Estamos preparando la información de forma segura.</p></div></main>}

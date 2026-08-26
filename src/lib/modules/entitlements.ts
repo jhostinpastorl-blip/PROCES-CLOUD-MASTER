@@ -1,0 +1,1 @@
+import{createClient}from"@/lib/supabase/server";import{requireCompany}from"@/lib/auth/context";export async function requireModule(companyId:string,code:string){await requireCompany(companyId);const s=await createClient();const{data,error}=await s.rpc("company_has_module",{p_company_id:companyId,p_code:code});if(error||!data)throw new Error("MODULE_NOT_ENTITLED");return true}

@@ -1,0 +1,1 @@
+export function formDataObject(form:FormData){return Object.fromEntries(form.entries())}

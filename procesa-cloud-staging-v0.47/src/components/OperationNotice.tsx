@@ -1,0 +1,1 @@
+export function OperationNotice({kind="info",children}:{kind?:"info"|"success"|"warning"|"danger";children:React.ReactNode}){return <div className={`operation-notice ${kind}`} role="status">{children}</div>}

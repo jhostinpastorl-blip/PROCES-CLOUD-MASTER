@@ -1,0 +1,1 @@
+import{z}from"zod";export const uuid=z.string().uuid();export const safeCode=z.string().min(1).max(40).regex(/^[A-Za-z0-9_-]+$/);export const email=z.string().trim().toLowerCase().email().max(254);export const shortText=z.string().trim().min(1).max(160);

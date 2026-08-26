@@ -1,0 +1,2 @@
+"use server";import{z}from"zod";import{revalidatePath}from"next/cache";import{createClient}from"@/lib/supabase/server";
+export async function markRead(f:FormData){const id=z.string().uuid().parse(f.get("id"));const s=await createClient();const{data:{user}}=await s.auth.getUser();if(!user)throw new Error("UNAUTHENTICATED");const{error}=await s.from("notifications").update({read_at:new Date().toISOString()}).eq("id",id).eq("user_id",user.id);if(error)throw error;revalidatePath("/app/notifications")}

@@ -1,0 +1,1 @@
+import{headers}from"next/headers";export async function assertSameOrigin(){const h=await headers();const origin=h.get("origin"),host=h.get("x-forwarded-host")||h.get("host");if(!origin||!host)return;const u=new URL(origin);if(u.host!==host)throw new Error("CSRF_ORIGIN_MISMATCH")}
