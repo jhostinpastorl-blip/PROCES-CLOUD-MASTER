@@ -23,12 +23,12 @@ export async function isFeatureEnabled(
   if (flag.scope === "GLOBAL") return true;
 
   if (flag.scope === "PLAN" && flag.target_value && context.planCode) {
-    const targetPlans = flag.target_value.split(",").map((x) => x.trim().toLowerCase());
+    const targetPlans = flag.target_value.split(",").map((x: string) => x.trim().toLowerCase());
     return targetPlans.includes(context.planCode.toLowerCase());
   }
 
   if (flag.scope === "COMPANY" && flag.target_value && context.companyId) {
-    const targetCompanies = flag.target_value.split(",").map((x) => x.trim());
+    const targetCompanies = flag.target_value.split(",").map((x: string) => x.trim());
     return targetCompanies.includes(context.companyId);
   }
 
