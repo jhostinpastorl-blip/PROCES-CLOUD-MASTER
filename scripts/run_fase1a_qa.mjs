@@ -440,9 +440,9 @@ async function runFase1aQA() {
   // ───────────────────────────────────────
   // INVENTORY TESTS
   // ───────────────────────────────────────
-  console.log("\n8. INVENTORY-01 a 07 (Inventario y Stock)...");
+  console.log("\n8. INVENTORY-01 a 09 (Inventario y Stock)...");
 
-  // INVENTORY-01: Establecer stock inicial mediante RPC
+  // INVENTORY-01 / INVENTORY-05A: Establecer stock inicial mediante RPC (1ra vez)
   const { error: inv1Err } = await clientA.rpc("set_initial_stock", {
     p_company_id: compAId,
     p_warehouse_id: whGeneralId,
@@ -454,8 +454,10 @@ async function runFase1aQA() {
 
   if (!inv1Err) {
     pass("INVENTORY-01", "Stock inicial establecido correctamente vía RPC auditable (150 unidades)");
+    pass("INVENTORY-05A", "Primera llamada a INITIAL_STOCK aceptada exitosamente: PASS");
   } else {
     fail("INVENTORY-01", `Error al establecer stock inicial: ${inv1Err.message}`);
+    fail("INVENTORY-05A", `Error al establecer stock inicial: ${inv1Err.message}`);
   }
 
   // INVENTORY-02: Consultar balance de stock
@@ -485,7 +487,7 @@ async function runFase1aQA() {
     fail("INVENTORY-03", "Tenant B pudo leer balances de inventario de Tenant A");
   }
 
-  // INVENTORY-04: Cantidad inválida (negativa o cero) rechazada
+  // INVENTORY-04: Cantidad inválida (negativa) rechazada
   const { error: inv4Err } = await clientA.rpc("set_initial_stock", {
     p_company_id: compAId,
     p_warehouse_id: whGeneralId,
@@ -500,39 +502,20 @@ async function runFase1aQA() {
     fail("INVENTORY-04", `Cantidad negativa no fue rechazada. Error: ${JSON.stringify(inv4Err)}`);
   }
 
-  // INVENTORY-05: Segunda ejecución de INITIAL_STOCK para el mismo producto + almacén
-  const { error: inv5Err } = await clientA.rpc("set_initial_stock", {
+  // INVENTORY-05B: Segunda llamada a set_initial_stock para el mismo producto + almacén -> DENIED
+  const { error: inv5bErr } = await clientA.rpc("set_initial_stock", {
     p_company_id: compAId,
     p_warehouse_id: whGeneralId,
     p_product_id: prod1Id,
     p_quantity: 200,
     p_unit_cost: 2.30,
-    p_notes: "Segunda carga de stock inicial",
+    p_notes: "Segunda carga de stock inicial no permitida",
   });
 
-  const { data: inv5Balance } = await clientA
-    .from("inventory_balances")
-    .select("quantity")
-    .eq("company_id", compAId)
-    .eq("warehouse_id", whGeneralId)
-    .eq("product_id", prod1Id)
-    .single();
-
-  const { data: inv5Movements } = await clientA
-    .from("inventory_movements")
-    .select("id, movement_type, quantity")
-    .eq("company_id", compAId)
-    .eq("warehouse_id", whGeneralId)
-    .eq("product_id", prod1Id);
-
-  if (!inv5Err && Number(inv5Balance.quantity) === 200 && inv5Movements.length === 2) {
-    pass("INVENTORY-05", "Segunda llamada a set_initial_stock REEMPLAZA el balance a 200 y añade un 2do movimiento INITIAL_STOCK (comportamiento UPSERT auditable)", {
-      behavior: "REPLACE_BALANCE_AND_APPEND_MOVEMENT",
-      currentBalance: 200,
-      totalMovements: inv5Movements.length,
-    });
+  if (inv5bErr && inv5bErr.message.includes("INITIAL_STOCK_ALREADY_EXISTS")) {
+    pass("INVENTORY-05B", "Segunda llamada a INITIAL_STOCK rechazada con INITIAL_STOCK_ALREADY_EXISTS: DENIED", { duplicateInitialStock: "DENIED" });
   } else {
-    fail("INVENTORY-05", `Comportamiento inesperado en segunda carga inicial: ${inv5Err?.message}`);
+    fail("INVENTORY-05B", `Segunda inicialización debió ser rechazada con INITIAL_STOCK_ALREADY_EXISTS. Error: ${inv5bErr?.message}`);
   }
 
   // INVENTORY-06: Servicio con allows_inventory=false intenta recibir INITIAL_STOCK
@@ -562,6 +545,68 @@ async function runFase1aQA() {
     pass("INVENTORY-07", "Intento de inicializar stock en almacén ajeno rechazado con WAREHOUSE_NOT_FOUND: DENIED", { crossTenantWarehouse: "DENIED" });
   } else {
     fail("INVENTORY-07", `Tenant A pudo usar almacén ajeno o error inesperado: ${inv7Err?.message}`);
+  }
+
+  // INVENTORY-08: INITIAL_STOCK con cantidad cero (quantity = 0) es válido, segunda llamada DENIED
+  const { data: prodZero } = await clientA
+    .from("products")
+    .insert({
+      company_id: compAId,
+      code: `PROD-ZERO-${runId}`,
+      name: `Producto Inicial Cero ${runId}`,
+      price: 15.00,
+      allows_inventory: true,
+    })
+    .select("id")
+    .single();
+
+  const { error: inv8aErr } = await clientA.rpc("set_initial_stock", {
+    p_company_id: compAId,
+    p_warehouse_id: whGeneralId,
+    p_product_id: prodZero.id,
+    p_quantity: 0,
+    p_unit_cost: 0,
+  });
+
+  const { error: inv8bErr } = await clientA.rpc("set_initial_stock", {
+    p_company_id: compAId,
+    p_warehouse_id: whGeneralId,
+    p_product_id: prodZero.id,
+    p_quantity: 10,
+    p_unit_cost: 5,
+  });
+
+  if (!inv8aErr && inv8bErr && inv8bErr.message.includes("INITIAL_STOCK_ALREADY_EXISTS")) {
+    pass("INVENTORY-08", "INITIAL_STOCK en cero aceptado como balance válido y segunda llamada bloqueada con INITIAL_STOCK_ALREADY_EXISTS: PASS", { zeroQuantityInitialization: "PASS", secondCallBlocked: "DENIED" });
+  } else {
+    fail("INVENTORY-08", `Fallo en prueba de inicialización en cero. 8a: ${inv8aErr?.message}, 8b: ${inv8bErr?.message}`);
+  }
+
+  // INVENTORY-09: 2 llamadas concurrentes a INITIAL_STOCK (1 ACCEPTED, 1 DENIED)
+  const { data: prodConc } = await clientA
+    .from("products")
+    .insert({
+      company_id: compAId,
+      code: `PROD-CONC-${runId}`,
+      name: `Producto Concurrente ${runId}`,
+      price: 25.00,
+      allows_inventory: true,
+    })
+    .select("id")
+    .single();
+
+  const concResults = await Promise.allSettled([
+    clientA.rpc("set_initial_stock", { p_company_id: compAId, p_warehouse_id: whGeneralId, p_product_id: prodConc.id, p_quantity: 100 }),
+    clientA.rpc("set_initial_stock", { p_company_id: compAId, p_warehouse_id: whGeneralId, p_product_id: prodConc.id, p_quantity: 100 }),
+  ]);
+
+  const accepted = concResults.filter(r => r.status === "fulfilled" && !r.value.error);
+  const denied = concResults.filter(r => r.status === "fulfilled" && r.value.error);
+
+  if (accepted.length === 1 && denied.length === 1) {
+    pass("INVENTORY-09", "Concurrencia protegida: Exactamente 1 llamada fue aceptada y 1 fue rechazada por bloqueo transaccional/idempotencia: PASS", { accepted: 1, denied: 1 });
+  } else {
+    fail("INVENTORY-09", `Fallo en concurrencia. Aceptados: ${accepted.length}, Rechazados: ${denied.length}`);
   }
 
   // ───────────────────────────────────────
