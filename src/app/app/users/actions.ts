@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { audit } from "@/lib/audit/log";
 import { invitationToken } from "@/lib/security/token";
+import { assertCompanyOperable, assertUserLimit } from "@/lib/plans/limits";
 
 const schema = z.object({
   companyId: z.string().uuid(),
@@ -17,6 +18,9 @@ const schema = z.object({
 export async function inviteUser(f: FormData) {
   const p = schema.parse(Object.fromEntries(f));
   await requirePermission(p.companyId, "users.invite");
+  await assertCompanyOperable(p.companyId);
+  await assertUserLimit(p.companyId);
+
   const s = await createClient();
   const t = invitationToken();
   const expires = new Date(Date.now() + 72 * 3600_000).toISOString();
@@ -28,7 +32,15 @@ export async function inviteUser(f: FormData) {
     p_token_hash: t.hash,
     p_expires_at: expires,
   });
-  if (error) throw error;
+  if (error) {
+    if (error.message?.includes("PLAN_USER_LIMIT")) {
+      throw new Error("Has alcanzado el límite de usuarios de tu plan.");
+    }
+    if (error.message?.includes("SUBSCRIPTION_RESTRICTED")) {
+      throw new Error("Tu suscripción no está activa. Contacta a PROCESA.");
+    }
+    throw error;
+  }
 
   try {
     const admin = createAdminClient();
@@ -58,6 +70,6 @@ export async function revokeInvitation(f: FormData) {
   });
   if (error) throw error;
 
-  await audit(companyId, "invitation.revoked", "company_invitation", invitationId);
+  await audit(companyId, "user.invitation_revoked", "company_invitation", invitationId);
   revalidatePath("/app/users");
 }
