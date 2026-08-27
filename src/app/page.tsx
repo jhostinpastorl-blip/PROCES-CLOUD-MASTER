@@ -111,7 +111,7 @@ export default function Home() {
           <ThemeToggle />
           <a
             className="corp-link"
-            href="https://procesacorp.pages.dev/"
+            href="https://www.procesacorp.com/"
             target="_blank"
             rel="noreferrer"
           >
@@ -493,7 +493,7 @@ export default function Home() {
 
         <div>
           <h4>Empresa & Confianza</h4>
-          <a href="https://procesacorp.pages.dev/" target="_blank" rel="noreferrer">
+          <a href="https://www.procesacorp.com/" target="_blank" rel="noreferrer">
             PROCESA CORP Corporativo ↗
           </a>
           <Link href="/demo">Solicitar demostración</Link>
