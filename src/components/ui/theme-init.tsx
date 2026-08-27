@@ -1,1 +1,4 @@
-export function ThemeInit(){const code=`(()=>{try{const s=localStorage.getItem("procesa-theme");const t=s==="dark"||s==="light"?s:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t}catch{}})()`;return <script dangerouslySetInnerHTML={{__html:code}}/>}
+export function ThemeInit() {
+  const code = `(()=>{try{const s=localStorage.getItem("procesa-theme");const t=s==="dark"?"dark":"light";document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t}catch(e){}})()`;
+  return <script dangerouslySetInnerHTML={{ __html: code }} />;
+}

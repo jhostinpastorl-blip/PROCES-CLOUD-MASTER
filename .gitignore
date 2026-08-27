@@ -1,4 +1,4 @@
-﻿node_modules
+node_modules
 .next
 out
 dist
@@ -10,3 +10,4 @@ coverage
 .DS_Store
 *.log
 supabase/.temp
+*.tsbuildinfo

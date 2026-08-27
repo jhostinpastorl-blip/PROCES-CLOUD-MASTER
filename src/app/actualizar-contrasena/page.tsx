@@ -1,1 +1,37 @@
-import Link from"next/link";import{updatePassword}from"./actions";export default function UpdatePassword(){return <main className="form-shell"><div className="auth-card"><Link className="brand" href="/"><span className="brandmark">☁</span><span>PROCESA Cloud<small>PROCESA CORP</small></span></Link><span className="premium-kicker">NUEVA CONTRASEÑA</span><h1>Protege tu cuenta</h1><p className="sub">Usa al menos 10 caracteres y evita reutilizar contraseñas anteriores.</p><form action={updatePassword} className="form"><label>Nueva contraseña</label><input name="password" type="password" minLength={10} required/><label>Confirmar contraseña</label><input name="confirm" type="password" minLength={10} required/><button className="btn primary">Actualizar contraseña</button></form></div></main>}
+import { updatePassword } from "./actions";
+import { AuthShell } from "@/components/ui/auth-shell";
+import { PremiumField } from "@/components/ui/premium-field";
+
+export default function UpdatePassword() {
+  return (
+    <AuthShell
+      kicker="NUEVA CONTRASEÑA"
+      title="Protege tu cuenta"
+      subtitle="Ingresa tu nueva clave de acceso. Debe tener al menos 10 caracteres para garantizar la seguridad de tu empresa."
+    >
+      <form action={updatePassword} className="premium-form">
+        <PremiumField
+          label="Nueva contraseña"
+          name="password"
+          type="password"
+          placeholder="Mínimo 10 caracteres"
+          minLength={10}
+          autoComplete="new-password"
+          required
+        />
+        <PremiumField
+          label="Confirmar nueva contraseña"
+          name="confirm"
+          type="password"
+          placeholder="Repite tu nueva contraseña"
+          minLength={10}
+          autoComplete="new-password"
+          required
+        />
+        <button className="premium-submit" type="submit">
+          Actualizar contraseña <span>→</span>
+        </button>
+      </form>
+    </AuthShell>
+  );
+}

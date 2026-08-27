@@ -1,1 +1,31 @@
-import Link from"next/link";import{requestReset}from"./actions";export default function Recover(){return <main className="form-shell"><div className="auth-card"><Link className="brand" href="/"><span className="brandmark">☁</span><span>PROCESA Cloud<small>PROCESA CORP</small></span></Link><span className="premium-kicker">RECUPERAR ACCESO</span><h1>Restablece tu contraseña</h1><p className="sub">Ingresa tu correo. Si existe una cuenta, enviaremos un enlace seguro.</p><form action={requestReset} className="form"><label>Correo</label><input name="email" type="email" required/><button className="btn primary">Enviar enlace</button></form><p className="sub" style={{fontSize:13}}><Link href="/login">Volver a iniciar sesión</Link></p></div></main>}
+import Link from "next/link";
+import { requestReset } from "./actions";
+import { AuthShell } from "@/components/ui/auth-shell";
+import { PremiumField } from "@/components/ui/premium-field";
+
+export default function Recover() {
+  return (
+    <AuthShell
+      kicker="RECUPERAR ACCESO"
+      title="Restablece tu contraseña"
+      subtitle="Ingresa tu correo empresarial. Si existe una cuenta activa, te enviaremos un enlace de recuperación seguro."
+    >
+      <form action={requestReset} className="premium-form">
+        <PremiumField
+          label="Correo empresarial"
+          name="email"
+          type="email"
+          placeholder="nombre@empresa.com"
+          autoComplete="email"
+          required
+        />
+        <button className="premium-submit" type="submit">
+          Enviar enlace de recuperación <span>→</span>
+        </button>
+      </form>
+      <p className="auth-switch">
+        ¿Recordaste tu contraseña? <Link href="/login">Volver a iniciar sesión</Link>
+      </p>
+    </AuthShell>
+  );
+}

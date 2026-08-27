@@ -21,22 +21,20 @@ export default async function PosDashboardPage() {
 
   const [
     { count: productsCount },
-    { count: categoriesCount },
     { count: customersCount },
-    { count: suppliersCount },
     { count: warehousesCount },
-    { count: cashRegistersCount },
+    { count: salesCount },
+    { count: activeSessionsCount },
+    { data: recentSales },
     { data: recentProducts },
-    { data: recentCustomers },
   ] = await Promise.all([
     s.from("products").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).is("deleted_at", null),
-    s.from("categories").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).is("deleted_at", null),
     s.from("customers").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).is("deleted_at", null),
-    s.from("suppliers").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).is("deleted_at", null),
     s.from("warehouses").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).is("deleted_at", null),
-    s.from("cash_registers").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).is("deleted_at", null),
+    s.from("sales").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId),
+    s.from("cash_sessions").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).eq("status", "open"),
+    s.from("sales").select("id, document_number, total, created_at, status, customers(name)").eq("company_id", ctx.company.companyId).order("created_at", { ascending: false }).limit(4),
     s.from("products").select("id, code, name, price, type, is_active").eq("company_id", ctx.company.companyId).is("deleted_at", null).order("created_at", { ascending: false }).limit(4),
-    s.from("customers").select("id, doc_type, doc_number, name, is_active").eq("company_id", ctx.company.companyId).is("deleted_at", null).order("created_at", { ascending: false }).limit(4),
   ]);
 
   return (
@@ -44,59 +42,102 @@ export default async function PosDashboardPage() {
       <div className="premium-page-head real-head">
         <div>
           <span>PROCESA CLOUD · ECOSISTEMA COMERCIAL</span>
-          <h2>POS Cloud Foundation</h2>
-          <p>Base comercial de productos, clientes, almacenes, inventario y cajas para tu empresa.</p>
+          <h2>Punto de Venta (POS) Cloud</h2>
+          <p>Terminal de ventas rápidas, turnos de caja, inventario en tiempo real y comprobantes internos.</p>
         </div>
-        <StatusChip tone="success">Módulo POS Activo</StatusChip>
+        <div className="flex gap-2">
+          <Link
+            href="/app/pos/terminal"
+            className="px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            Abrir Terminal POS
+          </Link>
+        </div>
       </div>
 
-      <PosSubNav activePath="/app/pos" />
+      <PosSubNav />
 
       {/* KPI Cards */}
       <section className="stats-grid real-stats mb-6">
         <article className="stat-card">
-          <span>Productos y Servicios</span>
+          <span>Ventas Totales</span>
+          <strong>{salesCount ?? 0}</strong>
+          <small>Comprobantes emitidos</small>
+        </article>
+        <article className="stat-card">
+          <span>Turnos de Caja</span>
+          <strong className={activeSessionsCount ? "text-success" : "text-muted-foreground"}>
+            {activeSessionsCount ?? 0}
+          </strong>
+          <small>{activeSessionsCount ? "Cajas abiertas ahora" : "Sin cajas abiertas"}</small>
+        </article>
+        <article className="stat-card">
+          <span>Catálogo de Productos</span>
           <strong>{productsCount ?? 0}</strong>
-          <small>Ítems en catálogo</small>
+          <small>Ítems disponibles</small>
         </article>
         <article className="stat-card">
-          <span>Categorías</span>
-          <strong>{categoriesCount ?? 0}</strong>
-          <small>Familias comerciales</small>
-        </article>
-        <article className="stat-card">
-          <span>Clientes Registrados</span>
+          <span>Clientes</span>
           <strong>{customersCount ?? 0}</strong>
-          <small>Directorio comercial</small>
-        </article>
-        <article className="stat-card">
-          <span>Proveedores</span>
-          <strong>{suppliersCount ?? 0}</strong>
-          <small>Fuentes de suministro</small>
+          <small>Directorio registrado</small>
         </article>
         <article className="stat-card">
           <span>Almacenes</span>
           <strong>{warehousesCount ?? 0}</strong>
-          <small>Depósitos de stock</small>
-        </article>
-        <article className="stat-card">
-          <span>Cajas Registradoras</span>
-          <strong>{cashRegistersCount ?? 0}</strong>
-          <small>Puntos de cobro</small>
+          <small>Puntos de stock</small>
         </article>
       </section>
 
-      {/* Grid de Acceso Rápido */}
+      {/* Grid: Ventas Recientes vs Productos Recientes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Productos Recientes */}
+        {/* Ventas Recientes */}
         <section className="table-card">
           <div className="table-card-head">
             <div>
-              <h3>Productos Recientes</h3>
-              <p>Últimos ítems dados de alta en el catálogo.</p>
+              <h3>Últimas Ventas Emitidas</h3>
+              <p>Tickets y comprobantes recientes.</p>
             </div>
-            <Link href="/app/pos/products" className="text-xs text-primary hover:underline">
-              Ver catálogo →
+            <Link href="/app/pos/sales" className="text-xs text-primary hover:underline font-semibold">
+              Ver todas →
+            </Link>
+          </div>
+          <div className="divide-y divide-border/40 text-xs">
+            {recentSales?.map((sale: any) => (
+              <div key={sale.id} className="p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-primary font-bold text-xs">
+                      {sale.document_number}
+                    </span>
+                    <span className="text-muted-foreground">· {sale.customers?.name || "Cliente General"}</span>
+                  </div>
+                  <small className="text-muted-foreground">{new Date(sale.created_at).toLocaleString("es-PE")}</small>
+                </div>
+                <div className="text-right">
+                  <b className="text-foreground text-sm">S/ {Number(sale.total).toFixed(2)}</b>
+                  <div>
+                    <StatusChip tone={sale.status === "completed" ? "success" : "neutral"}>
+                      {sale.status === "completed" ? "Completado" : "Anulado"}
+                    </StatusChip>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {(!recentSales || recentSales.length === 0) && (
+              <p className="p-6 text-muted-foreground text-xs text-center">No hay ventas emitidas todavía.</p>
+            )}
+          </div>
+        </section>
+
+        {/* Catálogo de Productos */}
+        <section className="table-card">
+          <div className="table-card-head">
+            <div>
+              <h3>Catálogo de Productos</h3>
+              <p>Últimos productos listados para venta.</p>
+            </div>
+            <Link href="/app/pos/products" className="text-xs text-primary hover:underline font-semibold">
+              Ver productos →
             </Link>
           </div>
           <div className="divide-y divide-border/40 text-xs">
@@ -115,66 +156,11 @@ export default async function PosDashboardPage() {
               </div>
             ))}
             {(!recentProducts || recentProducts.length === 0) && (
-              <p className="p-4 text-muted text-xs text-center">No hay productos registrados aún.</p>
-            )}
-          </div>
-        </section>
-
-        {/* Clientes Recientes */}
-        <section className="table-card">
-          <div className="table-card-head">
-            <div>
-              <h3>Clientes Recientes</h3>
-              <p>Últimos clientes añadidos al directorio.</p>
-            </div>
-            <Link href="/app/pos/customers" className="text-xs text-primary hover:underline">
-              Ver clientes →
-            </Link>
-          </div>
-          <div className="divide-y divide-border/40 text-xs">
-            {recentCustomers?.map((c) => (
-              <div key={c.id} className="p-3.5 flex items-center justify-between">
-                <div>
-                  <b className="font-semibold text-foreground">{c.name}</b>
-                  <div>
-                    <small className="text-muted font-mono">{c.doc_type}: {c.doc_number}</small>
-                  </div>
-                </div>
-                <StatusChip tone={c.is_active ? "success" : "neutral"}>
-                  {c.is_active ? "Activo" : "Inactivo"}
-                </StatusChip>
-              </div>
-            ))}
-            {(!recentCustomers || recentCustomers.length === 0) && (
-              <p className="p-4 text-muted text-xs text-center">No hay clientes registrados aún.</p>
+              <p className="p-6 text-muted text-xs text-center">No hay productos registrados aún.</p>
             )}
           </div>
         </section>
       </div>
-
-      {/* Roadmap Próximas Subfases */}
-      <section className="table-card p-5">
-        <div className="table-card-head mb-3">
-          <div>
-            <h3>Roadmap de Módulo POS Cloud</h3>
-            <p>Evolución planificada hacia operaciones transaccionales.</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="border border-border/40 p-3.5 rounded-lg bg-card/50">
-            <span className="text-primary font-semibold block mb-1">FASE 1A · FOUNDATION (ACTUAL)</span>
-            <p className="text-muted">Catálogos, Productos, Clientes, Proveedores, Almacenes, Inventario Base y Cajas.</p>
-          </div>
-          <div className="border border-border/20 p-3.5 rounded-lg bg-muted/10 opacity-75">
-            <span className="text-muted font-semibold block mb-1">FASE 1B · VENTAS & CAJA (PRÓXIMA)</span>
-            <p className="text-muted">Terminal de ventas rápida, turnos de caja, apertura/cierre, tickets y comprobantes.</p>
-          </div>
-          <div className="border border-border/20 p-3.5 rounded-lg bg-muted/10 opacity-75">
-            <span className="text-muted font-semibold block mb-1">FASE 1C · COMPRAS & KARDEX</span>
-            <p className="text-muted">Órdenes de compra, recepción de mercadería, ajustes de stock y valorización.</p>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
