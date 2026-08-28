@@ -26,8 +26,9 @@ MAIN contains only the objects expected from the early CORE foundation:
 
 QA additionally contains the later control-plane, onboarding, billing, POS,
 inventory, returns, reporting and CPE domains through the repository's pre-072
-shape. Those objects are not safe evidence of an applied migration chain because
-QA has no migration ledger.
+shape. Migration 071 is itself partial: its weighted-cost RPC body is present,
+but its supporting company/product index is missing. Those objects are not safe
+evidence of an applied migration chain because QA has no migration ledger.
 
 ## Classification
 

@@ -9,6 +9,10 @@ Production target: protected; no write was performed.
 - QA contains the functional schema through CPE/returns but has no
   `supabase_migrations.schema_migrations` relation and the management API
   reports zero migrations. This is migration-history drift, not a clean 001–072 chain.
+- Migration 071 is only partially represented: `create_pos_purchase` contains
+  the weighted-average calculation and pessimistic lock, but the required
+  `idx_inventory_balances_company_product` index is absent. There is no ledger
+  entry proving how that function reached QA.
 - Before hardening QA exposed 68 public-schema functions: 66 were
   `SECURITY DEFINER`, all 68 were executable by `anon` and `authenticated`,
   and 14 definers had no explicit `search_path`.
