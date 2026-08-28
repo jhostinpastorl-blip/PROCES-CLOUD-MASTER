@@ -1993,6 +1993,391 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
   font-size: 11px;
 }
 
+/* ------------------------------------------------------------
+   12. APP CORE THEME HARMONIZATION (LUZ ON & LUZ OFF)
+   ------------------------------------------------------------ */
+
+/* Luz OFF (data-theme="dark") App styles */
+html[data-theme="dark"] .app-layout,
+:root[data-theme="dark"] .app-layout {
+  background: #050816 !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .app-topbar,
+:root[data-theme="dark"] .app-topbar {
+  background: rgba(10, 18, 40, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09) !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .app-topbar b,
+:root[data-theme="dark"] .app-topbar b {
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .app-topbar small,
+:root[data-theme="dark"] .app-topbar small {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .page-head h1,
+:root[data-theme="dark"] .page-head h1,
+html[data-theme="dark"] .real-head h2,
+:root[data-theme="dark"] .real-head h2,
+html[data-theme="dark"] .panel h3,
+:root[data-theme="dark"] .panel h3,
+html[data-theme="dark"] .panel-head h3,
+:root[data-theme="dark"] .panel-head h3,
+html[data-theme="dark"] .table-card-head h3,
+:root[data-theme="dark"] .table-card-head h3,
+html[data-theme="dark"] .real-company-card h3,
+:root[data-theme="dark"] .real-company-card h3,
+html[data-theme="dark"] .role-card h3,
+:root[data-theme="dark"] .role-card h3,
+html[data-theme="dark"] .module-admin-card h3,
+:root[data-theme="dark"] .module-admin-card h3 {
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .page-head p,
+:root[data-theme="dark"] .page-head p,
+html[data-theme="dark"] .sub,
+:root[data-theme="dark"] .sub,
+html[data-theme="dark"] .panel-head p,
+:root[data-theme="dark"] .panel-head p,
+html[data-theme="dark"] .stat-card span,
+:root[data-theme="dark"] .stat-card span,
+html[data-theme="dark"] .stat-card small,
+:root[data-theme="dark"] .stat-card small,
+html[data-theme="dark"] .role-card small,
+:root[data-theme="dark"] .role-card small,
+html[data-theme="dark"] .module-admin-card p,
+:root[data-theme="dark"] .module-admin-card p {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .panel,
+:root[data-theme="dark"] .panel,
+html[data-theme="dark"] .stat-card,
+:root[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .company-card,
+:root[data-theme="dark"] .company-card,
+html[data-theme="dark"] .role-card,
+:root[data-theme="dark"] .role-card,
+html[data-theme="dark"] .module-admin-card,
+:root[data-theme="dark"] .module-admin-card,
+html[data-theme="dark"] .form-card,
+:root[data-theme="dark"] .form-card,
+html[data-theme="dark"] .info-card,
+:root[data-theme="dark"] .info-card,
+html[data-theme="dark"] .table-card,
+:root[data-theme="dark"] .table-card,
+html[data-theme="dark"] .settings-card,
+:root[data-theme="dark"] .settings-card,
+html[data-theme="dark"] .real-company-card,
+:root[data-theme="dark"] .real-company-card,
+html[data-theme="dark"] .inline-create-card,
+:root[data-theme="dark"] .inline-create-card,
+html[data-theme="dark"] .module-market-grid article,
+:root[data-theme="dark"] .module-market-grid article,
+html[data-theme="dark"] .context-select-card,
+:root[data-theme="dark"] .context-select-card,
+html[data-theme="dark"] .notification-list article,
+:root[data-theme="dark"] .notification-list article,
+html[data-theme="dark"] .notice-card,
+:root[data-theme="dark"] .notice-card {
+  background: linear-gradient(180deg, rgba(16, 26, 52, 0.75), rgba(8, 14, 30, 0.75)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  color: #f8fafc !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 28px rgba(0, 0, 0, 0.4) !important;
+}
+
+html[data-theme="dark"] .table-row,
+:root[data-theme="dark"] .table-row,
+html[data-theme="dark"] .company-row,
+:root[data-theme="dark"] .company-row,
+html[data-theme="dark"] .premium-tr,
+:root[data-theme="dark"] .premium-tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .table-row span,
+:root[data-theme="dark"] .table-row span,
+html[data-theme="dark"] .premium-tr span,
+:root[data-theme="dark"] .premium-tr span {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .table-row b,
+:root[data-theme="dark"] .table-row b,
+html[data-theme="dark"] .premium-tr b,
+:root[data-theme="dark"] .premium-tr b {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .stat-card strong,
+:root[data-theme="dark"] .stat-card strong {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .context-box div,
+:root[data-theme="dark"] .context-box div,
+html[data-theme="dark"] .context-premium-grid>div,
+:root[data-theme="dark"] .context-premium-grid>div,
+html[data-theme="dark"] .real-company-meta div,
+:root[data-theme="dark"] .real-company-meta div {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .context-box span,
+:root[data-theme="dark"] .context-box span,
+html[data-theme="dark"] .context-premium-grid span,
+:root[data-theme="dark"] .context-premium-grid span,
+html[data-theme="dark"] .real-company-meta span,
+:root[data-theme="dark"] .real-company-meta span {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .context-box b,
+:root[data-theme="dark"] .context-box b,
+html[data-theme="dark"] .context-premium-grid b,
+:root[data-theme="dark"] .context-premium-grid b,
+html[data-theme="dark"] .real-company-meta b,
+:root[data-theme="dark"] .real-company-meta b {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .quick-grid a,
+:root[data-theme="dark"] .quick-grid a,
+html[data-theme="dark"] .quick-premium-grid a,
+:root[data-theme="dark"] .quick-premium-grid a {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] input,
+:root[data-theme="dark"] input,
+html[data-theme="dark"] select,
+:root[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+:root[data-theme="dark"] textarea,
+html[data-theme="dark"] .inline-form input,
+:root[data-theme="dark"] .inline-form input,
+html[data-theme="dark"] .inline-form select,
+:root[data-theme="dark"] .inline-form select {
+  background: #091326 !important;
+  border: 1px solid #1e3258 !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .premium-kicker,
+:root[data-theme="dark"] .premium-kicker {
+  background: rgba(56, 189, 248, 0.12) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+}
+
+/* Luz ON (data-theme="light") App styles */
+html[data-theme="light"] .app-layout,
+:root[data-theme="light"] .app-layout {
+  background: #f4f7fb !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .app-topbar,
+:root[data-theme="light"] .app-topbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .app-topbar b,
+:root[data-theme="light"] .app-topbar b {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .app-topbar small,
+:root[data-theme="light"] .app-topbar small {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .page-head h1,
+:root[data-theme="light"] .page-head h1,
+html[data-theme="light"] .real-head h2,
+:root[data-theme="light"] .real-head h2,
+html[data-theme="light"] .panel h3,
+:root[data-theme="light"] .panel h3,
+html[data-theme="light"] .panel-head h3,
+:root[data-theme="light"] .panel-head h3,
+html[data-theme="light"] .table-card-head h3,
+:root[data-theme="light"] .table-card-head h3,
+html[data-theme="light"] .real-company-card h3,
+:root[data-theme="light"] .real-company-card h3,
+html[data-theme="light"] .role-card h3,
+:root[data-theme="light"] .role-card h3,
+html[data-theme="light"] .module-admin-card h3,
+:root[data-theme="light"] .module-admin-card h3 {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .page-head p,
+:root[data-theme="light"] .page-head p,
+html[data-theme="light"] .sub,
+:root[data-theme="light"] .sub,
+html[data-theme="light"] .panel-head p,
+:root[data-theme="light"] .panel-head p,
+html[data-theme="light"] .stat-card span,
+:root[data-theme="light"] .stat-card span,
+html[data-theme="light"] .stat-card small,
+:root[data-theme="light"] .stat-card small,
+html[data-theme="light"] .role-card small,
+:root[data-theme="light"] .role-card small,
+html[data-theme="light"] .module-admin-card p,
+:root[data-theme="light"] .module-admin-card p {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .panel,
+:root[data-theme="light"] .panel,
+html[data-theme="light"] .stat-card,
+:root[data-theme="light"] .stat-card,
+html[data-theme="light"] .company-card,
+:root[data-theme="light"] .company-card,
+html[data-theme="light"] .role-card,
+:root[data-theme="light"] .role-card,
+html[data-theme="light"] .module-admin-card,
+:root[data-theme="light"] .module-admin-card,
+html[data-theme="light"] .form-card,
+:root[data-theme="light"] .form-card,
+html[data-theme="light"] .info-card,
+:root[data-theme="light"] .info-card,
+html[data-theme="light"] .table-card,
+:root[data-theme="light"] .table-card,
+html[data-theme="light"] .settings-card,
+:root[data-theme="light"] .settings-card,
+html[data-theme="light"] .real-company-card,
+:root[data-theme="light"] .real-company-card,
+html[data-theme="light"] .inline-create-card,
+:root[data-theme="light"] .inline-create-card,
+html[data-theme="light"] .module-market-grid article,
+:root[data-theme="light"] .module-market-grid article,
+html[data-theme="light"] .context-select-card,
+:root[data-theme="light"] .context-select-card,
+html[data-theme="light"] .notification-list article,
+:root[data-theme="light"] .notification-list article,
+html[data-theme="light"] .notice-card,
+:root[data-theme="light"] .notice-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05) !important;
+}
+
+html[data-theme="light"] .table-row,
+:root[data-theme="light"] .table-row,
+html[data-theme="light"] .company-row,
+:root[data-theme="light"] .company-row,
+html[data-theme="light"] .premium-tr,
+:root[data-theme="light"] .premium-tr {
+  border-bottom: 1px solid #edf0f4 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .table-row span,
+:root[data-theme="light"] .table-row span,
+html[data-theme="light"] .premium-tr span,
+:root[data-theme="light"] .premium-tr span {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .table-row b,
+:root[data-theme="light"] .table-row b,
+html[data-theme="light"] .premium-tr b,
+:root[data-theme="light"] .premium-tr b {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .stat-card strong,
+:root[data-theme="light"] .stat-card strong {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .stat-card span,
+:root[data-theme="light"] .stat-card span,
+html[data-theme="light"] .stat-card small,
+:root[data-theme="light"] .stat-card small {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .context-box div,
+:root[data-theme="light"] .context-box div,
+html[data-theme="light"] .context-premium-grid>div,
+:root[data-theme="light"] .context-premium-grid>div,
+html[data-theme="light"] .real-company-meta div,
+:root[data-theme="light"] .real-company-meta div {
+  background: #f8fafc !important;
+  border: 1px solid #edf0f4 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .context-box span,
+:root[data-theme="light"] .context-box span,
+html[data-theme="light"] .context-premium-grid span,
+:root[data-theme="light"] .context-premium-grid span,
+html[data-theme="light"] .real-company-meta span,
+:root[data-theme="light"] .real-company-meta span {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .context-box b,
+:root[data-theme="light"] .context-box b,
+html[data-theme="light"] .context-premium-grid b,
+:root[data-theme="light"] .context-premium-grid b,
+html[data-theme="light"] .real-company-meta b,
+:root[data-theme="light"] .real-company-meta b {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .quick-grid a,
+:root[data-theme="light"] .quick-grid a,
+html[data-theme="light"] .quick-premium-grid a,
+:root[data-theme="light"] .quick-premium-grid a {
+  background: #f4f7fd !important;
+  border: 1px solid #d9e2f5 !important;
+  color: #2563eb !important;
+}
+
+html[data-theme="light"] input,
+:root[data-theme="light"] input,
+html[data-theme="light"] select,
+:root[data-theme="light"] select,
+html[data-theme="light"] textarea,
+:root[data-theme="light"] textarea,
+html[data-theme="light"] .inline-form input,
+:root[data-theme="light"] .inline-form input,
+html[data-theme="light"] .inline-form select,
+:root[data-theme="light"] .inline-form select {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .premium-kicker,
+:root[data-theme="light"] .premium-kicker {
+  background: #e0f2fe !important;
+  color: #0284c7 !important;
+  border: 1px solid #bae6fd !important;
+}
+
 /* RESPONSIVE BREAKPOINTS */
 @media(max-width: 1080px) {
   .landing-nav-links { display: none; }
