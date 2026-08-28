@@ -35,31 +35,29 @@ const faqs = [
 export default function Home() {
   return (
     <main className="landing-final">
-      {/* HEADER PÚBLICO FLOTANTE GLASS */}
+      {/* HEADER PÚBLICO FLOTANTE GLASS CAPSULE */}
       <div className="landing-nav-wrapper">
         <header className="landing-nav glass-header">
-          <Link href="/" className="landing-brand" aria-label="PROCESA Cloud Inicio">
-            <ProcesaLogo />
-          </Link>
-          <nav aria-label="Navegación principal">
-            <a href="#soluciones">Soluciones</a>
-            <a href="#ecosistema">Ecosistema</a>
-            <a href="#como-funciona">Cómo funciona</a>
-            <a href="#multiempresa">Multiempresa</a>
-            <a href="#planes">Planes</a>
-            <a href="#seguridad">Seguridad</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div className="landing-actions">
-            <ThemeToggle />
+          <nav className="landing-nav-links" aria-label="Navegación principal">
+            <a href="#" className="nav-item active">Inicio</a>
+            <a href="#soluciones" className="nav-item">Soluciones</a>
+            <a href="#como-funciona" className="nav-item">Cómo trabajamos</a>
+            <a href="#ecosistema" className="nav-item">Casos de uso</a>
+            <a href="#seguridad" className="nav-item">Tecnologías</a>
             <a
-              className="corp-link"
               href="https://www.procesacorp.com/"
               target="_blank"
               rel="noreferrer"
+              className="nav-item corp-nav-item"
             >
-              PROCESA CORP ↗
+              Nosotros ↗
             </a>
+            <Link href="/demo" className="nav-item">
+              Contacto
+            </Link>
+          </nav>
+          <div className="landing-actions">
+            <ThemeToggle />
             <Link className="nav-login" href="/login">
               Iniciar sesión
             </Link>
