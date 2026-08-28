@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 
+/**
+ * @deprecated Compatibility reader for migration 055 only.
+ * Activation Foundation writes exclusively to public.onboarding_states.
+ */
+
 export interface OnboardingStateRecord {
   id: string;
   current_step: number;

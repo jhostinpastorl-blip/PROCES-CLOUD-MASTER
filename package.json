@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "test:core": "node --experimental-strip-types --test tests/core-activation.test.mjs",
     "verify": "node scripts/verify-project.mjs && node scripts/check-tenant-sql.mjs",
     "ci": "npm run verify && npm run typecheck && npm run build",
     "build:cloudflare": "npx @opennextjs/cloudflare build",
