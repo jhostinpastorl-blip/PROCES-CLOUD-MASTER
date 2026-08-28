@@ -2,7 +2,18 @@
 
 ## Estado
 
-Implementado en código sobre `develop/procesacloudv2`. La migración `072_core_saas_activation_foundation.sql` es una propuesta local: **no fue aplicada a Supabase remoto** y esta versión no debe desplegarse hasta el gate del propietario.
+**IMPLEMENTED:** código y migraciones 072/073 en `develop/procesacloudv2`.
+
+**STATICALLY VERIFIED:** compatibilidad, dependencias, RLS, grants y regresión de
+aplicación revisados en repositorio.
+
+**DATABASE VERIFIED:** 071, 072 y el estado combinado 072+073 ejecutaron en
+PostgreSQL 17 de PROCESA CLOUD QA dentro de transacciones revertidas. La suite
+pgTAP llegó a 26/26 casos de aislamiento y autorización.
+
+**PRODUCTION VERIFIED:** no. Producción no fue modificada. 072/073 tampoco se
+persistieron en QA porque esa base no registra el historial 001–071 aunque sí
+contiene el esquema funcional avanzado. Resolver ese baseline es un gate previo.
 
 ## Decisiones
 
@@ -32,6 +43,12 @@ El estado persistido incluye `status`, `current_step`, `last_completed_step`, `w
 
 Las acciones validan usuario, compañía, permiso y/o entitlement en backend. Las RPC nuevas son `security definer` con `search_path=''`, permisos explícitos y auditoría. `company_id` forma parte de activaciones y scopes; las relaciones compuestas impiden asignar membresía o sucursal de otro tenant. El parámetro `next` acepta solo rutas relativas allowlisted.
 
+El P0 de 073 revoca EXECUTE de `PUBLIC`/`anon`, elimina RPC accidentales de
+triggers, retira acceso browser a helpers bootstrap, fija el `search_path` de
+definers legacy y reconstruye grants de tabla de `authenticated` desde las
+operaciones realmente cubiertas por RLS. El inventario completo está en
+`docs/security/CORE_P0_RPC_RLS_INVENTORY.md`.
+
 El scope por sucursal de esta etapa es una foundation: restringe `branches` y el contexto efectivo. CORE SaaS 2 deberá propagar la comprobación a cada agregado POS branch-bound y añadir pruebas RLS de integración sobre Postgres local.
 
 ## Compatibilidad, rollback y feature flag
@@ -43,8 +60,18 @@ El scope por sucursal de esta etapa es una foundation: restringe `branches` y el
 
 ## Validación
 
-`npm run test:core`, `npm run typecheck`, `npm run verify` y `npm run build` pasan. QA visual local revisado en desktop y móvil; la aceptación visual del propietario permanece pendiente. Supabase CLI no estaba instalado, por lo que no se ejecutó una base local ni pgTAP.
+La validación anterior de aplicación registró `npm run test:core`, typecheck,
+verify y build en PASS. En este gate se añadió una suite pgTAP de 26 casos y un
+job CI que levanta Supabase aislado, aplica la cadena completa y bloquea ante un
+fallo RLS/RPC/tenant. La máquina actual no tiene Docker, por lo que el reset
+local completo queda a cargo del nuevo gate CI; la misma suite sí se ejecutó en
+QA con rollback y sin cambios persistentes.
 
 ## Siguiente etapa (no iniciada)
 
-CORE SaaS 2 — POS Activation: almacén, caja, productos, stock, CPE readiness, venta de prueba y estado POS READY.
+CORE SaaS 2 — POS Activation permanece **NO-GO** hasta reconstruir o baselinar
+de forma verificable QA, aplicar 071–073 en orden y volver a ejecutar el gate
+contra el estado persistido.
+
+El portafolio histórico `TODOS LOS PORTAFOLIOS APLICACIONES WEBS` queda
+**PENDIENTE DE AUDITORÍA FUNCIONAL POSTERIOR** y no fue revisado en este gate.
