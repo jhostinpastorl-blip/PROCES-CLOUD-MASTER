@@ -7,6 +7,18 @@ import { HERO_PRODUCT_EXPERIENCES, ProductExperience } from "@/config/product-ex
 export function ProductHeroCarousel() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const currentProduct: ProductExperience = HERO_PRODUCT_EXPERIENCES[currentIndex];
+  const isLeadExperience = currentIndex === 0;
+  const heroLead = isLeadExperience ? "PROCESA CLOUD" : currentProduct.name;
+  const heroHeadline = isLeadExperience ? "Tu empresa." : currentProduct.headline;
+  const heroEmphasis = isLeadExperience ? "Procesándose en tiempo real." : currentProduct.headlineEmphasis;
+  const heroDescription = isLeadExperience
+    ? "Centraliza ventas, inventario, sucursales y control operativo en un ecosistema empresarial modular."
+    : currentProduct.description;
+  const heroSector = isLeadExperience ? "Ecosistema empresarial modular" : currentProduct.sector;
+  const heroStatus = isLeadExperience ? "Producto en evolución · Vista demostrativa" : currentProduct.statusLabel;
+  const heroFeatures = isLeadExperience ? ["Ventas", "Sucursales", "Inventario", "Control"] : currentProduct.features;
+  const primaryCta = isLeadExperience ? { label: "Comenzar gratis", href: "/registro" } : currentProduct.primaryCta;
+  const secondaryCta = isLeadExperience ? { label: "Solicitar demo", href: "/demo" } : currentProduct.secondaryCta;
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => (prev === 0 ? HERO_PRODUCT_EXPERIENCES.length - 1 : prev - 1));
@@ -69,28 +81,28 @@ export function ProductHeroCarousel() {
         <div className="hero-slide-copy">
           <div className="eyebrow-container">
             <span className="eyebrow-sector">
-              <i className="sector-icon">◆</i> {currentProduct.sector}
+              <i className="sector-icon">◆</i> {heroSector}
             </span>
             <span className={`status-pill tone-${currentProduct.statusTone}`}>
-              {currentProduct.statusLabel}
+              {heroStatus}
             </span>
           </div>
 
           <h1 className="hero-heading">
-            <span className="heading-brand-lead">{currentProduct.name}</span>
+            <span className="heading-brand-lead">{heroLead}</span>
             <br />
-            <span className="heading-white-line">{currentProduct.headline}</span>
+            <span className="heading-white-line">{heroHeadline}</span>
             <br />
-            <span className="heading-gradient-line">{currentProduct.headlineEmphasis}</span>
+            <span className="heading-gradient-line">{heroEmphasis}</span>
           </h1>
 
           <p className="hero-desc">
-            {currentProduct.description}{" "}
+            {heroDescription}{" "}
             <span className="hero-slogan-accent">El futuro se procesa hoy.</span>
           </p>
 
           <div className="hero-feature-tags" aria-label="Capacidades principales">
-            {currentProduct.features.map((feat) => (
+            {heroFeatures.map((feat) => (
               <span key={feat} className="feature-tag-chip">
                 <span className="check-mark">✓</span> {feat}
               </span>
@@ -98,19 +110,19 @@ export function ProductHeroCarousel() {
           </div>
 
           <div className="hero-actions-row">
-            <Link className="pc-btn pc-btn-primary pc-btn-lg hero-cta-btn" href={currentProduct.primaryCta.href}>
-              {currentProduct.primaryCta.label} <span className="cta-arrow" aria-hidden="true">→</span>
+            <Link className="pc-btn pc-btn-primary pc-btn-lg hero-cta-btn" href={primaryCta.href}>
+              {primaryCta.label} <span className="cta-arrow" aria-hidden="true">→</span>
             </Link>
-            <Link className="pc-btn pc-btn-secondary pc-btn-lg hero-cta-secondary" href={currentProduct.secondaryCta.href}>
-              {currentProduct.secondaryCta.label}
+            <Link className="pc-btn pc-btn-secondary pc-btn-lg hero-cta-secondary" href={secondaryCta.href}>
+              {secondaryCta.label}
             </Link>
           </div>
 
           <div className="trust-pills-row">
             <span>✓ Multiempresa nativo</span>
             <span>✓ Multisucursal</span>
-            <span>✓ Información aislada</span>
-            <span>✓ Arquitectura modular</span>
+            <span>✓ Roles y permisos</span>
+            <span>✓ Auditoría operativa</span>
           </div>
         </div>
 
@@ -129,11 +141,28 @@ export function ProductHeroCarousel() {
                   <span className="lock-icon">🔒</span>
                   <span>app.procesacloud.com/{currentProduct.id}</span>
                 </div>
-                <span className="chrome-badge-interactive">{currentProduct.visual.badgeText}</span>
+                <span className="chrome-badge-interactive">DEMO · {currentProduct.visual.badgeText}</span>
               </div>
 
               {/* CUERPO INTERNO ESTILO APLICACIÓN */}
-              <div className="mockup-body">
+              <div className="mockup-workspace">
+                <aside className="mockup-sidebar" aria-label="Vista demostrativa de navegación">
+                  <div className="mockup-sidebar-brand">PC</div>
+                  {[
+                    ["⌂", "Inicio"],
+                    ["▣", "Operaciones"],
+                    ["◇", "Inventario"],
+                    ["▤", "Finanzas"],
+                    ["◎", "Reportes"],
+                  ].map(([icon, label], index) => (
+                    <span key={label} className={index === 0 ? "is-active" : ""}>
+                      <i aria-hidden="true">{icon}</i><b>{label}</b>
+                    </span>
+                  ))}
+                  <div className="mockup-viernes-orb" aria-label="Viernes AI">✦</div>
+                </aside>
+
+                <div className="mockup-body">
                 {/* HEADER DE LA APP */}
                 <div className="mockup-app-topbar">
                   <div className="app-tenant-badge">
@@ -149,10 +178,23 @@ export function ProductHeroCarousel() {
                 {/* TÍTULO Y CONTEXTO */}
                 <div className="mockup-header">
                   <div>
-                    <span className="kicker-lead">MÓDULO EN EJECUCIÓN</span>
-                    <h3 className="mockup-title">{currentProduct.visual.title}</h3>
+                    <span className="kicker-lead">ENTORNO DEMOSTRATIVO · MÓDULO EN EJECUCIÓN</span>
+                    <h3 className="mockup-title">{isLeadExperience ? "PROCESA Cloud · Panel operativo" : currentProduct.visual.title}</h3>
                     <p className="mockup-subtitle">{currentProduct.visual.subtitle}</p>
                   </div>
+                </div>
+
+                <div className="mockup-module-grid" aria-label="Módulos del ecosistema">
+                  {[
+                    ["POS", "Punto de venta"],
+                    ["INV", "Inventario"],
+                    ["FIN", "Finanzas"],
+                    ["AUD", "Auditoría"],
+                  ].map(([code, label]) => (
+                    <div key={code}>
+                      <i>{code}</i><span>{label}</span>
+                    </div>
+                  ))}
                 </div>
 
                 {/* GRID DE KPIs */}
@@ -172,9 +214,14 @@ export function ProductHeroCarousel() {
                     <span className="metric-lbl">{currentProduct.visual.metricTertiary.label}</span>
                     <b className="metric-subval">{currentProduct.visual.metricTertiary.value}</b>
                   </div>
+                  <div className="metric-card metric-security">
+                    <span className="metric-lbl">Contexto y acceso</span>
+                    <b className="metric-subval">Empresa · Sucursal · Rol</b>
+                  </div>
                 </div>
 
                 {/* SIMULADOR DE EVENTOS EN VIVO */}
+                <div className="mockup-lower-grid">
                 <div className="mockup-stream">
                   <div className="stream-header-row">
                     <span className="stream-title">Actividad operativa en tiempo real</span>
@@ -191,6 +238,14 @@ export function ProductHeroCarousel() {
                       </div>
                     ))}
                   </div>
+                </div>
+                <div className="mockup-viernes-card">
+                  <span>VIERNES AI · DEMO</span>
+                  <b>¿Qué necesita atención hoy?</b>
+                  <p>Consulta la operación según empresa, sucursal y permisos.</p>
+                  <i>Explorar asistencia →</i>
+                </div>
+                </div>
                 </div>
               </div>
 

@@ -1,8 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ProcesaLogo } from "@/components/ui/procesa-logo";
 import { ProductHeroCarousel } from "@/components/landing/ProductHeroCarousel";
+import { LandingMotion } from "@/components/landing/LandingMotion";
+import { LandingNav } from "@/components/landing/LandingNav";
 import { ECOSYSTEM_SOLUTIONS_CATALOG } from "@/config/product-experiences";
 
 const faqs = [
@@ -35,94 +36,56 @@ const faqs = [
 export default function Home() {
   return (
     <main className="landing-final">
-      {/* HEADER PÚBLICO FLOTANTE GLASS CAPSULE */}
-      <div className="landing-nav-wrapper">
-        <header className="landing-nav glass-header">
-          <nav className="landing-nav-links" aria-label="Navegación principal">
-            <a href="#" className="nav-item active">Inicio</a>
-            <a href="#soluciones" className="nav-item">Soluciones</a>
-            <a href="#como-funciona" className="nav-item">Cómo trabajamos</a>
-            <a href="#ecosistema" className="nav-item">Casos de uso</a>
-            <a href="#seguridad" className="nav-item">Tecnologías</a>
-            <a
-              href="https://www.procesacorp.com/"
-              target="_blank"
-              rel="noreferrer"
-              className="nav-item corp-nav-item"
-            >
-              Nosotros ↗
-            </a>
-            <Link href="/demo" className="nav-item">
-              Contacto
-            </Link>
-          </nav>
-          <div className="landing-actions">
-            <ThemeToggle />
-            <Link className="nav-login" href="/login">
-              Iniciar sesión
-            </Link>
-            <Link className="pc-btn pc-btn-primary pc-btn-sm header-cta-btn" href="/demo">
-              Solicitar demo <span className="cta-arrow" aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </header>
-      </div>
+      <LandingMotion />
+      <LandingNav />
 
       {/* HERO V2: CARRUSEL MULTIPRODUCTO ESTRATÉGICO */}
-      <section className="hero-final">
+      <section className="hero-final" data-reveal="hero">
         <div className="hero-v2-container">
           <ProductHeroCarousel />
         </div>
       </section>
 
       {/* STRIP DE MARCA & SOLUCIONES ESTRATÉGICAS */}
-      <section className="proof-strip">
-        <span>Ecosistema empresarial oficial de PROCESA CORP:</span>
-        <b>PROCESA POS</b>
-        <b>PROCESA REST</b>
-        <b>PROCESA CONTA</b>
-        <b>PROCESA GYM</b>
-        <b>PROCESA VET</b>
-        <b>PROCESA RRHH</b>
-        <b>PROCESA DOCS</b>
-        <b>VIERNES AI</b>
+      <section className="proof-strip" aria-label="Capacidades verificadas" data-reveal>
+        <span className="proof-strip-lead">Arquitectura preparada para operar con control</span>
+        <div><i aria-hidden="true">◇</i><b>Multiempresa</b><small>Contextos separados</small></div>
+        <div><i aria-hidden="true">⌘</i><b>Multisucursal</b><small>Operación conectada</small></div>
+        <div><i aria-hidden="true">◎</i><b>Roles y permisos</b><small>Acceso por responsabilidad</small></div>
+        <div><i aria-hidden="true">↗</i><b>Auditoría</b><small>Trazabilidad operativa</small></div>
       </section>
 
       {/* SECCIÓN #ecosistema: LA PLATAFORMA UNIFICADA */}
-      <section id="ecosistema" className="landing-section intro-section">
+      <section id="ecosistema" className="landing-section intro-section" data-reveal>
         <div className="section-heading">
           <span>UNA PLATAFORMA, TODAS TUS CAPACIDADES</span>
-          <h2>Deja de operar con sistemas desconectados.</h2>
+          <h2>Una sola operación. Todas tus sedes conectadas.</h2>
           <p>
-            Tradicionalmente las empresas contratan un software para facturar, otro para inventarios,
-            planillas en hojas de cálculo y archivos dispersos. PROCESA Cloud unifica todo alrededor
-            de una base común: tu empresa, tus sucursales, tus equipos y tus permisos.
+            Centraliza ventas, inventario, equipos y permisos alrededor de una misma empresa.
+            Menos sistemas aislados; más control para decidir y crecer.
           </p>
         </div>
 
         <div className="value-grid">
           <article className="pc-card">
             <div className="pc-badge pc-badge-brand pc-badge-sm">01</div>
-            <h3>Activa solo lo que necesitas</h3>
+            <h3>Empieza con lo esencial</h3>
             <p>
-              Comienza con el Core administrativo y enciende módulos especializados (POS, REST, CONTA, RRHH)
-              a medida que tu operativa lo demande, compartiendo la misma base de usuarios.
+              Configura empresa, sucursales y equipo; activa nuevas capacidades cuando tu operación las necesite.
             </p>
           </article>
           <article className="pc-card">
             <div className="pc-badge pc-badge-brand pc-badge-sm">02</div>
-            <h3>Crece sin migrar de sistema</h3>
+            <h3>Crece sin volver a empezar</h3>
             <p>
-              Añade nuevas sucursales, almacenes y líneas de negocio manteniendo tus catálogos,
-              inventarios y reportes consolidados en un único ecosistema.
+              Añade sedes y almacenes conservando el mismo contexto, catálogo y gobierno de acceso.
             </p>
           </article>
           <article className="pc-card">
             <div className="pc-badge pc-badge-brand pc-badge-sm">03</div>
-            <h3>Gobierno y roles granulares</h3>
+            <h3>Cada persona ve lo necesario</h3>
             <p>
-              Autorización validada estrictamente en servidor y base de datos. Cada colaborador
-              accede exclusivamente a las funciones que su puesto autoriza.
+              Roles y permisos delimitan las acciones de cada colaborador dentro de su empresa y sucursal.
             </p>
           </article>
         </div>
@@ -131,10 +94,10 @@ export default function Home() {
         <div className="connected-ecosystem-box">
           <div className="connected-hub-grid">
             <div className="connected-hub-copy">
-              <span style={{ fontSize: 10, letterSpacing: "0.14em", color: "#ffd900", fontWeight: 800 }}>
+              <span className="section-kicker section-kicker-gold">
                 ARQUITECTURA DE ECOSISTEMA
               </span>
-              <h3>Todo tu negocio conectado con PROCESA Cloud.</h3>
+              <h3>Una base común para toda tu operación.</h3>
               <p>
                 Los puntos de venta, las operaciones de restaurante, la contabilidad y la gestión de personal
                 no son programas aislados. Funcionan integrados sobre el Core SaaS de PROCESA Cloud,
@@ -175,13 +138,13 @@ export default function Home() {
       </section>
 
       {/* SECCIÓN #soluciones: CATÁLOGO DE SOLUCIONES POR CATEGORÍA */}
-      <section id="soluciones" className="landing-section modules-section" style={{ background: "var(--pc-bg-subtle, #f7f9fc)" }}>
+      <section id="soluciones" className="landing-section modules-section surface-section" data-reveal>
         <div className="section-heading center">
           <span>CATÁLOGO DE SOLUCIONES</span>
-          <h2>Soluciones para cada tipo de negocio.</h2>
+          <h2>Explora un ecosistema que crece contigo.</h2>
           <p>
-            Explora las capacidades especializadas por sector y el estado real de cada producto
-            dentro del ecosistema tecnológico de PROCESA CORP.
+            Conoce las capacidades disponibles y el roadmap de productos de PROCESA CORP,
+            claramente identificado por etapa.
           </p>
         </div>
 
@@ -215,10 +178,10 @@ export default function Home() {
       </section>
 
       {/* SECCIÓN #como-funciona: ONBOARDING PROGRESIVO */}
-      <section id="como-funciona" className="how-section">
+      <section id="como-funciona" className="how-section" data-reveal>
         <div className="how-copy">
           <span>FLUJO TRANSPARENTE</span>
-          <h2>De la cuenta a la operación en 5 pasos claros.</h2>
+          <h2>De tu cuenta a una operación organizada.</h2>
           <p>
             El registro inicial estructura la identidad y permisos de tu organización.
             Una vez configurada, puedes expandir sucursales y módulos según tu ritmo de crecimiento.
@@ -245,7 +208,7 @@ export default function Home() {
       </section>
 
       {/* SECCIÓN #multiempresa: MULTIEMPRESA Y MULTISUCURSAL */}
-      <section id="multiempresa" className="landing-section" style={{ background: "var(--pc-bg-subtle, #f7f9fc)" }}>
+      <section id="multiempresa" className="landing-section surface-section" data-reveal>
         <div className="section-heading center">
           <span>ARQUITECTURA MULTISEDE Y MULTITENANT</span>
           <h2>Diseñado para grupos corporativos y empresas en expansión.</h2>
@@ -255,24 +218,24 @@ export default function Home() {
           </p>
         </div>
 
-        <div style={{ maxWidth: 960, margin: "40px auto 0", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+        <div className="multi-company-grid">
           <div className="pc-card">
-            <h4 style={{ margin: "0 0 8px", fontSize: 16 }}>Administra una o varias empresas</h4>
-            <p style={{ fontSize: 13, color: "var(--pc-text-muted)", lineHeight: 1.6 }}>
+            <h4>Administra una o varias empresas</h4>
+            <p>
               Alterna entre tu Empresa A y tu Empresa B sin cerrar sesión. El selector de
               contexto valida tus membresías activas instantáneamente.
             </p>
           </div>
           <div className="pc-card">
-            <h4 style={{ margin: "0 0 8px", fontSize: 16 }}>Conecta tus sucursales</h4>
-            <p style={{ fontSize: 13, color: "var(--pc-text-muted)", lineHeight: 1.6 }}>
+            <h4>Conecta tus sucursales</h4>
+            <p>
               Cada sucursal posee código operativo, dirección y configuración propia. Las cajas y
               el inventario se supervisan de forma local o consolidada.
             </p>
           </div>
           <div className="pc-card">
-            <h4 style={{ margin: "0 0 8px", fontSize: 16 }}>Módulos independientes por empresa</h4>
-            <p style={{ fontSize: 13, color: "var(--pc-text-muted)", lineHeight: 1.6 }}>
+            <h4>Módulos independientes por empresa</h4>
+            <p>
               Una empresa de tu grupo puede operar con PROCESA POS y REST, mientras otra
               utiliza únicamente CONTA y RRHH. Flexibilidad comercial total.
             </p>
@@ -281,14 +244,13 @@ export default function Home() {
       </section>
 
       {/* SECCIÓN VIERNES: INTELIGENCIA TRANSVERSAL */}
-      <section className="viernes-section">
+      <section className="viernes-section" data-reveal>
         <div>
           <span>VIERNES · INTELIGENCIA DE NEGOCIO</span>
           <h2>Pregunta por tu negocio.<br />Con contexto y permisos reales.</h2>
           <p>
-            Viernes es el asistente inteligente transversal de PROCESA Cloud diseñado para
-            responder preguntas operativas respetando siempre la empresa activa, la sucursal
-            y los permisos del colaborador.
+            Viernes convierte el contexto de tu empresa, sucursal y permisos en respuestas
+            operativas útiles. Su experiencia se presenta como una capacidad en evolución.
           </p>
           <div style={{ marginTop: 24 }}>
             <Link className="pc-btn pc-btn-white pc-btn-md" href="/demo">
@@ -306,7 +268,7 @@ export default function Home() {
       </section>
 
       {/* SECCIÓN #planes: PLANES ESCALABLES */}
-      <section id="planes" className="landing-section pricing-section">
+      <section id="planes" className="landing-section pricing-section" data-reveal>
         <div className="section-heading center">
           <span>PLANES PREPARADOS PARA ESCALAR</span>
           <h2>Empieza simple. Crece cuando lo necesites.</h2>
@@ -351,7 +313,7 @@ export default function Home() {
       </section>
 
       {/* SECCIÓN #seguridad: SEGURIDAD DESDE EL CORE */}
-      <section id="seguridad" className="security-section">
+      <section id="seguridad" className="security-section" data-reveal>
         <div className="security-panel">
           <span>SEGURIDAD ARQUITECTÓNICA</span>
           <h2>Información aislada y protegida por empresa.</h2>
@@ -365,8 +327,8 @@ export default function Home() {
               "Aislamiento Multi-Tenant estricto por empresa",
               "Políticas de seguridad a nivel de motor de base de datos",
               "54 permisos granulares de control de acceso",
-              "Sesiones cifradas y autenticación segura",
-              "Registro inmutable de auditoría para operaciones sensibles",
+              "Sesiones autenticadas y controles de acceso",
+              "Registro de auditoría para operaciones sensibles",
               "Control Plane Super Admin aislado para PROCESA CORP",
             ].map((item) => (
               <div key={item}>✓ {item}</div>
@@ -391,7 +353,7 @@ export default function Home() {
       </section>
 
       {/* SECCIÓN #faq: PREGUNTAS FRECUENTES */}
-      <section id="faq" className="landing-section faq-section">
+      <section id="faq" className="landing-section faq-section" data-reveal>
         <div className="section-heading">
           <span>PREGUNTAS FRECUENTES</span>
           <h2>Todo lo que necesitas saber antes de empezar.</h2>
@@ -414,14 +376,14 @@ export default function Home() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="final-cta">
+      <section className="final-cta" data-reveal>
         <span>PROCESA CLOUD · PROCESA CORP</span>
         <h2>
-          Haz que tu empresa opere<br />
-          como una sola plataforma unificada.
+          Conecta tu empresa.<br />
+          Controla la operación que sigue.
         </h2>
         <p>
-          Comienza con el Core, activa las soluciones que requieres y escala sin cambiar de software.
+          Organiza empresa, sucursales y equipo en un mismo entorno; activa nuevas capacidades a tu ritmo.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 24 }}>
           <Link className="pc-btn pc-btn-white pc-btn-lg" href="/registro">
