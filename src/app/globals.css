@@ -216,7 +216,7 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 @media(max-width:900px){.admin-command-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.module-choice-grid,.admin-command-grid{grid-template-columns:1fr}.onboarding-complete>div:last-child{flex-direction:column}.auth-form-wrap h2{font-size:32px}}
 
 /* ============================================================
-   PROCESA CLOUD V2 — PREMIUM DUAL-THEME SYSTEM (HOTFIX VISUAL 3)
+   PROCESA CLOUD V2 — PREMIUM DUAL-THEME SYSTEM
    SISTEMA LUZ ON / LUZ OFF — DOS ENTORNOS VISUALES DISEÑADOS
    ============================================================ */
 
@@ -269,7 +269,7 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 
   --cta-btn-bg: linear-gradient(135deg, #2563eb, #7c3aed 55%, #db2777);
   --cta-btn-border: rgba(255, 255, 255, 0.32);
-  --cta-btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), inset 0 -1px 0 rgba(0, 0, 0, 0.45), 0 10px 30px rgba(37, 99, 235, 0.35), 0 0 25px rgba(124, 58, 237, 0.25);
+  --cta-btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), inset 0 -1px 0 rgba(0, 0, 0, 0.45), 0 8px 24px rgba(37, 99, 235, 0.28), 0 0 20px rgba(124, 58, 237, 0.16);
   
   --cta-secondary-bg: linear-gradient(180deg, rgba(24, 38, 76, 0.7), rgba(12, 20, 44, 0.7));
   --cta-secondary-border: rgba(255, 255, 255, 0.18);
@@ -340,8 +340,8 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
   --proof-strip-text: #475569;
 
   --cta-btn-bg: linear-gradient(135deg, #2563eb, #7c3aed 55%, #db2777);
-  --cta-btn-border: rgba(255, 255, 255, 0.5);
-  --cta-btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 8px 24px rgba(37, 99, 235, 0.25);
+  --cta-btn-border: rgba(255, 255, 255, 0.45);
+  --cta-btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 8px 20px rgba(37, 99, 235, 0.20), 0 0 16px rgba(124, 58, 237, 0.10);
 
   --cta-secondary-bg: rgba(255, 255, 255, 0.85);
   --cta-secondary-border: rgba(71, 85, 105, 0.16);
@@ -470,25 +470,146 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
   background: rgba(148, 163, 184, 0.1);
 }
 
-.header-cta-btn {
-  background: var(--cta-btn-bg) !important;
-  border: 1px solid var(--cta-btn-border) !important;
-  box-shadow: var(--cta-btn-shadow) !important;
-  color: #ffffff !important;
-  font-weight: 800;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 12px;
-  text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* ------------------------------------------------------------
+   5. CTA AMBIENT BREATHING & LUXURY SPECULAR ANIMATION
+   ------------------------------------------------------------ */
+@keyframes ctaAmbientGlowDark {
+  0%, 100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+      0 8px 24px rgba(37, 99, 235, 0.28),
+      0 0 20px rgba(124, 58, 237, 0.16);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.48),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+      0 10px 28px rgba(37, 99, 235, 0.36),
+      0 0 32px rgba(219, 39, 119, 0.22);
+  }
 }
 
-.header-cta-btn:hover {
-  transform: translateY(-1px);
+@keyframes ctaAmbientGlowLight {
+  0%, 100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      0 8px 20px rgba(37, 99, 235, 0.20),
+      0 0 16px rgba(124, 58, 237, 0.10);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.68),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      0 10px 24px rgba(37, 99, 235, 0.26),
+      0 0 24px rgba(219, 39, 119, 0.14);
+  }
+}
+
+.header-cta-btn,
+.hero-cta-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--cta-btn-bg) !important;
+  border: 1px solid var(--cta-btn-border) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  isolation: isolate;
+  animation: ctaAmbientGlowDark 5.8s ease-in-out infinite;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease, filter 0.22s ease;
+}
+
+:root[data-theme="light"] .header-cta-btn,
+:root[data-theme="light"] .hero-cta-btn {
+  animation: ctaAmbientGlowLight 5.8s ease-in-out infinite;
+}
+
+/* Shimmer Specular Light Band */
+.header-cta-btn::before,
+.hero-cta-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.15) 44%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.12) 56%,
+    transparent 78%
+  );
+  transform: translateX(-130%) skewX(-20deg);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Arrow micro-motion */
+.header-cta-btn .cta-arrow,
+.hero-cta-btn .cta-arrow {
+  display: inline-block;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover State */
+.header-cta-btn:hover,
+.hero-cta-btn:hover {
+  transform: translateY(-1px) scale(1.015);
+  filter: brightness(1.05);
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.header-cta-btn:hover::before,
+.hero-cta-btn:hover::before {
+  transform: translateX(140%) skewX(-20deg);
+}
+
+.header-cta-btn:hover .cta-arrow,
+.hero-cta-btn:hover .cta-arrow {
+  transform: translateX(3px);
+}
+
+/* Active / Click State */
+.header-cta-btn:active,
+.hero-cta-btn:active {
+  transform: translateY(0) scale(0.985);
+  filter: brightness(0.96);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* Focus Visible */
+.header-cta-btn:focus-visible,
+.hero-cta-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 8px 24px rgba(37, 99, 235, 0.35) !important;
+}
+
+/* Header specific padding */
+.header-cta-btn {
+  padding: 8px 18px;
+  font-size: 12px;
+}
+
+/* Hero specific padding */
+.hero-cta-btn {
+  padding: 13px 26px;
+  font-size: 14px;
 }
 
 /* ------------------------------------------------------------
-   5. LUXURY SWITCH (LUZ ON / LUZ OFF)
+   6. LUXURY SWITCH (LUZ ON / LUZ OFF)
    ------------------------------------------------------------ */
 .theme-switch-container {
   display: flex;
@@ -552,7 +673,7 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 }
 
 /* ------------------------------------------------------------
-   6. HERO CONTAINER & TYPOGRAPHY
+   7. HERO CONTAINER & TYPOGRAPHY
    ------------------------------------------------------------ */
 .hero-final {
   padding: 38px max(4vw, 24px) 32px;
@@ -779,19 +900,6 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
   margin-top: 4px;
 }
 
-.hero-cta-btn {
-  background: var(--cta-btn-bg) !important;
-  border: 1px solid var(--cta-btn-border) !important;
-  color: #ffffff !important;
-  box-shadow: var(--cta-btn-shadow) !important;
-  font-weight: 800;
-  transition: all 0.2s ease;
-}
-
-.hero-cta-btn:hover {
-  transform: translateY(-2px);
-}
-
 .hero-cta-secondary {
   background: var(--cta-secondary-bg) !important;
   border: 1px solid var(--cta-secondary-border) !important;
@@ -800,6 +908,11 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
   color: var(--cta-secondary-text) !important;
   font-weight: 700;
   box-shadow: var(--cta-secondary-shadow) !important;
+  padding: 13px 24px;
+  font-size: 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
 }
 
 .hero-cta-secondary:hover {
@@ -817,7 +930,7 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 }
 
 /* ------------------------------------------------------------
-   7. MOCKUP WINDOW RIGHT SIDE: HIGH-CONTRAST ENTERPRISE FRAME
+   8. MOCKUP WINDOW RIGHT SIDE: HIGH-CONTRAST ENTERPRISE FRAME
    ------------------------------------------------------------ */
 .hero-slide-visual {
   display: flex;
@@ -1123,7 +1236,7 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 }
 
 /* ------------------------------------------------------------
-   8. CONTROLES DEL CARRUSEL: ANTERIOR / SIGUIENTE
+   9. CONTROLES DEL CARRUSEL: ANTERIOR / SIGUIENTE
    ------------------------------------------------------------ */
 .carousel-controls-bar {
   display: flex;
@@ -1207,7 +1320,7 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 }
 
 /* ------------------------------------------------------------
-   9. STRIP DE MARCA & PROOF
+   10. STRIP DE MARCA & PROOF
    ------------------------------------------------------------ */
 .proof-strip {
   min-height: 76px;
@@ -1239,7 +1352,7 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 }
 
 /* ------------------------------------------------------------
-   10. SECCIONES COMPLEMENTARIAS
+   11. SECCIONES COMPLEMENTARIAS
    ------------------------------------------------------------ */
 .landing-section {
   padding: 96px max(4vw, 24px);
@@ -1910,9 +2023,16 @@ html[data-theme="dark"] .demo-error-banner{background:rgba(180,35,58,.2);border-
 }
 
 @media(prefers-reduced-motion: reduce) {
-  .product-pill-tab, .hero-slide-grid, .mockup-shell, .mockup-frame, .carousel-arrow-btn, .catalog-product-card, .pulse-beacon, .landing-final, .luxury-theme-switch, .switch-knob {
+  .header-cta-btn, .hero-cta-btn, .product-pill-tab, .hero-slide-grid, .mockup-shell, .mockup-frame, .carousel-arrow-btn, .catalog-product-card, .pulse-beacon, .landing-final, .luxury-theme-switch, .switch-knob {
     transition: none !important;
     animation: none !important;
     transform: none !important;
+  }
+  .header-cta-btn::before, .hero-cta-btn::before {
+    display: none !important;
+  }
+  .header-cta-btn .cta-arrow, .hero-cta-btn .cta-arrow {
+    transform: none !important;
+    transition: none !important;
   }
 }

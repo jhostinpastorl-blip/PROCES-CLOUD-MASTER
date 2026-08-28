@@ -99,7 +99,7 @@ export function ProductHeroCarousel() {
 
           <div className="hero-actions-row">
             <Link className="pc-btn pc-btn-primary pc-btn-lg hero-cta-btn" href={currentProduct.primaryCta.href}>
-              {currentProduct.primaryCta.label} →
+              {currentProduct.primaryCta.label} <span className="cta-arrow" aria-hidden="true">→</span>
             </Link>
             <Link className="pc-btn pc-btn-secondary pc-btn-lg hero-cta-secondary" href={currentProduct.secondaryCta.href}>
               {currentProduct.secondaryCta.label}

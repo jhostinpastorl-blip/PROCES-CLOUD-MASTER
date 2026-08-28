@@ -62,7 +62,7 @@ export default function Home() {
               Iniciar sesión
             </Link>
             <Link className="pc-btn pc-btn-primary pc-btn-sm header-cta-btn" href="/demo">
-              Solicitar demo
+              Solicitar demo <span className="cta-arrow" aria-hidden="true">→</span>
             </Link>
           </div>
         </header>
