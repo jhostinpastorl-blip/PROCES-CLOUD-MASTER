@@ -104,3 +104,6 @@ Estados permitidos: `FUNCTIONAL`, `PARTIAL`, `UI ONLY`, `NOT IMPLEMENTED`, `BLOC
 11. Conversión de trial o contacto comercial calificado.
 
 No se propone instrumentación en esta etapa; las métricas definen el contrato de producto para una fase posterior aprobada.
+# Implementation note — CORE SaaS 1
+
+Activation Foundation implementa el tramo cuenta → empresa → solución activada con reanudación server-side. El detalle operativo y el stop gate están en `docs/architecture/CORE_ACTIVATION_FOUNDATION.md`; CORE SaaS 2 permanece fuera de alcance.

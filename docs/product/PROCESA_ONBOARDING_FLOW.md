@@ -236,3 +236,6 @@ Cada evento debe usar IDs internos, versión del flujo y timestamp; no incluir s
 ## 14. Gate
 
 Este diseño debe revisarse junto con `SOLUTION_PACKAGES_AND_ENTITLEMENTS.md`. Hasta aprobar fuente canónica, taxonomía, scopes y política de email, **no se debe implementar ni crear migration 072**.
+# Implementation note — canonical V1
+
+`onboarding_states` es la fuente canónica. El mapping legacy es `plan → profile`, `modules → branch` y `complete → solution_setup/dashboard`; `user_onboarding_states` queda deprecada sin borrado.

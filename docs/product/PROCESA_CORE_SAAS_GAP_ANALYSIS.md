@@ -198,3 +198,6 @@ La evaluación se realizó sobre la landing de staging y las rutas `/design-prev
 ## 8. Decisión final
 
 **No iniciar 7E ni crear migración 072.** La siguiente acción correcta es aprobar/rechazar los contratos conceptuales de los otros tres documentos. Tras esa aprobación debe emitirse una nueva orden de implementación con alcance, migraciones, RLS, QA y rollback explícitos.
+# Implementation note — CORE SaaS 1
+
+Los gaps P0 de first entry, onboarding canónico, toggle de sucursal, identidad de miembros, invitaciones, controles fake y promesa ⌘K fueron abordados en código. Branch authorization queda como foundation y requiere propagación a todos los agregados branch-bound en la siguiente etapa.

@@ -200,3 +200,6 @@ No se define aquí número de migración. En particular, **no se autoriza migrat
 8. ¿Qué tabla de onboarding será canónica?
 
 Hasta resolver estas decisiones, la arquitectura permanece como propuesta documental.
+# Implementation note — V1
+
+La migración 072 propone catálogo versionado, paquetes y activaciones multi-solución. `getEffectiveEntitlements` es la nueva fachada de lectura; `plans`, `subscriptions`, `modules` y `company_modules` continúan siendo los mecanismos técnicos existentes.
