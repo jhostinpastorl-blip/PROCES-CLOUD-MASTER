@@ -42,7 +42,7 @@ export function ProductHeroCarousel() {
       aria-roledescription="carrusel de productos"
       aria-label="Ecosistema de Soluciones PROCESA Cloud"
     >
-      {/* NAVEGACIÓN SUPERIOR DE PRODUCTOS (CHIPS ACTIVOS) */}
+      {/* NAVEGACIÓN SUPERIOR DE PRODUCTOS (PILLS DEL ECOSISTEMA) */}
       <nav className="carousel-product-selector" aria-label="Seleccionar solución del ecosistema">
         {HERO_PRODUCT_EXPERIENCES.map((p, idx) => {
           const isActive = idx === currentIndex;
@@ -79,11 +79,15 @@ export function ProductHeroCarousel() {
           <h1 className="hero-heading">
             <span className="heading-brand-lead">{currentProduct.name}</span>
             <br />
-            {currentProduct.headline}{" "}
-            <em className="heading-emphasis">{currentProduct.headlineEmphasis}</em>
+            <span className="heading-white-line">{currentProduct.headline}</span>
+            <br />
+            <span className="heading-gradient-line">{currentProduct.headlineEmphasis}</span>
           </h1>
 
-          <p className="hero-desc">{currentProduct.description}</p>
+          <p className="hero-desc">
+            {currentProduct.description}{" "}
+            <span className="hero-slogan-accent">El futuro se procesa hoy.</span>
+          </p>
 
           <div className="hero-feature-tags" aria-label="Capacidades principales">
             {currentProduct.features.map((feat) => (
@@ -97,7 +101,7 @@ export function ProductHeroCarousel() {
             <Link className="pc-btn pc-btn-primary pc-btn-lg hero-cta-btn" href={currentProduct.primaryCta.href}>
               {currentProduct.primaryCta.label} →
             </Link>
-            <Link className="pc-btn pc-btn-secondary pc-btn-lg" href={currentProduct.secondaryCta.href}>
+            <Link className="pc-btn pc-btn-secondary pc-btn-lg hero-cta-secondary" href={currentProduct.secondaryCta.href}>
               {currentProduct.secondaryCta.label}
             </Link>
           </div>
@@ -105,13 +109,15 @@ export function ProductHeroCarousel() {
           <div className="trust-pills-row">
             <span>✓ Multiempresa nativo</span>
             <span>✓ Multisucursal</span>
-            <span>✓ Información aislada y protegida</span>
+            <span>✓ Información aislada</span>
+            <span>✓ Arquitectura modular</span>
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: PANEL CONCEPTUAL INTERACTIVO */}
+        {/* COLUMNA DERECHA: VENTANA DE PRODUCTO ENTERPRISE */}
         <div className="hero-slide-visual">
           <div className="mockup-frame">
+            {/* BARRA SUPERIOR DE VENTANA */}
             <div className="mockup-chrome">
               <div className="chrome-controls">
                 <span className="dot dot-red" />
@@ -120,23 +126,35 @@ export function ProductHeroCarousel() {
               </div>
               <div className="chrome-url">
                 <span className="lock-icon">🔒</span>
-                <span>procesacloud.com/{currentProduct.id}</span>
+                <span>app.procesacloud.com/{currentProduct.id}</span>
               </div>
               <span className="chrome-badge-interactive">{currentProduct.visual.badgeText}</span>
             </div>
 
+            {/* CUERPO INTERNO ESTILO APLICACIÓN */}
             <div className="mockup-body">
-              <div className="mockup-header">
-                <div>
-                  <span className="kicker-lead">ENTORNO DEMOSTRATIVO CONCEPTUAL</span>
-                  <h3 className="mockup-title">{currentProduct.visual.title}</h3>
-                  <p className="mockup-subtitle">{currentProduct.visual.subtitle}</p>
+              {/* HEADER DE LA APP */}
+              <div className="mockup-app-topbar">
+                <div className="app-tenant-badge">
+                  <span className="tenant-dot" />
+                  <strong>Corporación Los Cedros SAC</strong>
+                  <span className="tenant-branch">· Sede Principal</span>
                 </div>
-                <div className="product-brand-chip">
-                  <span>{currentProduct.shortName}</span>
+                <div className="app-module-badge">
+                  <span className="module-tag">{currentProduct.shortName}</span>
                 </div>
               </div>
 
+              {/* TÍTULO Y CONTEXTO */}
+              <div className="mockup-header">
+                <div>
+                  <span className="kicker-lead">MÓDULO EN EJECUCIÓN</span>
+                  <h3 className="mockup-title">{currentProduct.visual.title}</h3>
+                  <p className="mockup-subtitle">{currentProduct.visual.subtitle}</p>
+                </div>
+              </div>
+
+              {/* GRID DE KPIs */}
               <div className="mockup-metrics-grid">
                 <div className="metric-card metric-primary">
                   <span className="metric-lbl">{currentProduct.visual.metricMain.label}</span>
@@ -155,9 +173,10 @@ export function ProductHeroCarousel() {
                 </div>
               </div>
 
+              {/* SIMULADOR DE EVENTOS EN VIVO */}
               <div className="mockup-stream">
                 <div className="stream-header-row">
-                  <span>Simulación de eventos de negocio</span>
+                  <span className="stream-title">Actividad operativa en tiempo real</span>
                   <span className="stream-live-indicator">
                     <i className="pulse-beacon" /> En vivo
                   </span>
@@ -174,17 +193,18 @@ export function ProductHeroCarousel() {
               </div>
             </div>
 
+            {/* PIE DE VENTANA */}
             <div className="mockup-footer">
-              <span>PROCESA Cloud · Ecosistema Empresarial de PROCESA CORP</span>
-              <a href="#modulos" className="mockup-detail-link">
-                Ver arquitectura del módulo →
+              <span className="footer-brand-label">PROCESA Cloud · Ecosistema Empresarial de PROCESA CORP</span>
+              <a href="#soluciones" className="mockup-detail-link">
+                Explorar catálogo →
               </a>
             </div>
           </div>
         </div>
       </div>
 
-      {/* CONTROLES DE NAVEGACIÓN INFERIORES Y FLECHAS */}
+      {/* CONTROLES DE NAVEGACIÓN INFERIORES: FLECHAS PROTAGONISTAS + INDICADORES */}
       <div className="carousel-controls-bar">
         <button
           type="button"
@@ -192,11 +212,11 @@ export function ProductHeroCarousel() {
           onClick={handlePrev}
           aria-label="Producto anterior"
         >
-          <span aria-hidden="true">←</span>
+          <span className="arrow-glyph" aria-hidden="true">←</span>
           <span className="arrow-text">Anterior</span>
         </button>
 
-        <div className="carousel-indicators" role="tablist" aria-label="Indicadores de diapositiva">
+        <div className="carousel-indicators" role="tablist" aria-label="Indicadores de solución">
           {HERO_PRODUCT_EXPERIENCES.map((p, idx) => (
             <button
               key={p.id}
@@ -205,7 +225,7 @@ export function ProductHeroCarousel() {
               aria-selected={idx === currentIndex}
               className={`indicator-dot ${idx === currentIndex ? "active" : ""}`}
               onClick={() => setCurrentIndex(idx)}
-              aria-label={`Ir a slide ${idx + 1}: ${p.name}`}
+              aria-label={`Ir a solución ${idx + 1}: ${p.name}`}
             />
           ))}
         </div>
@@ -217,7 +237,7 @@ export function ProductHeroCarousel() {
           aria-label="Producto siguiente"
         >
           <span className="arrow-text">Siguiente</span>
-          <span aria-hidden="true">→</span>
+          <span className="arrow-glyph" aria-hidden="true">→</span>
         </button>
       </div>
     </div>

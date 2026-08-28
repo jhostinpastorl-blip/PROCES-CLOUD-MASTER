@@ -69,7 +69,7 @@ export default function Home() {
       </header>
 
       {/* HERO V2: CARRUSEL MULTIPRODUCTO ESTRATÉGICO */}
-      <section className="hero-final" style={{ padding: "54px max(4.5vw, 24px) 42px" }}>
+      <section className="hero-final">
         <div className="hero-v2-container">
           <ProductHeroCarousel />
         </div>
