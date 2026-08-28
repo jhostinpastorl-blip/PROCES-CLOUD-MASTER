@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "¿Mis datos se mezclan con los de otras empresas?",
-    a: "De ninguna manera. PROCESA Cloud implementa una arquitectura multi-tenant con aislamiento estricto por empresa (company_id) y políticas Row-Level Security (RLS) en base de datos. La información de cada organización permanece herméticamente aislada.",
+    a: "PROCESA Cloud implementa una arquitectura multi-tenant que separa la información por empresa (company_id) y aplica políticas Row-Level Security (RLS) en base de datos para controlar cada acceso.",
   },
   {
     q: "¿Puedo manejar varias empresas y sucursales con un solo usuario?",
@@ -114,7 +114,7 @@ export default function Home() {
                 </div>
                 <div className="hub-feat-item">
                   <b>✓</b>
-                  <span><strong>Seguridad compartida:</strong> Roles, permisos y auditoría inmutable en cada operación.</span>
+                  <span><strong>Seguridad compartida:</strong> Roles, permisos y registro de auditoría para operaciones sensibles.</span>
                 </div>
               </div>
             </div>
@@ -326,7 +326,7 @@ export default function Home() {
             {[
               "Aislamiento Multi-Tenant estricto por empresa",
               "Políticas de seguridad a nivel de motor de base de datos",
-              "54 permisos granulares de control de acceso",
+              "Permisos granulares de control de acceso",
               "Sesiones autenticadas y controles de acceso",
               "Registro de auditoría para operaciones sensibles",
               "Control Plane Super Admin aislado para PROCESA CORP",
@@ -341,7 +341,7 @@ export default function Home() {
             ["AUTENTICACIÓN", "Sesión validada con Supabase Auth"],
             ["CONTEXTO EMPRESA", "Identificador company_id verificado"],
             ["SUCURSAL ACTIVA", "Permisos de local y operaciones asignados"],
-            ["SEGURIDAD RLS", "Filtro hermético a nivel de PostgreSQL"],
+            ["SEGURIDAD RLS", "Filtro por empresa a nivel de PostgreSQL"],
           ].map((x, i) => (
             <div key={x[0]}>
               <span>{x[0]}</span>
@@ -386,10 +386,10 @@ export default function Home() {
           Organiza empresa, sucursales y equipo en un mismo entorno; activa nuevas capacidades a tu ritmo.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 24 }}>
-          <Link className="pc-btn pc-btn-white pc-btn-lg" href="/registro">
+          <Link className="pc-btn pc-btn-primary pc-btn-lg" href="/registro">
             Crear cuenta empresarial
           </Link>
-          <Link className="pc-btn pc-btn-outline pc-btn-lg" href="/demo">
+          <Link className="pc-btn pc-btn-secondary pc-btn-lg" href="/demo">
             Solicitar demo
           </Link>
         </div>
