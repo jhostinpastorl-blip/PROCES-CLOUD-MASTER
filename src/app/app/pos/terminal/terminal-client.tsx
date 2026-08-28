@@ -39,6 +39,7 @@ interface PaymentLine {
   reference?: string;
 }
 
+// TEMPORARY IMPLEMENTATION: In-memory client-side tabs for up to 3 parked sales (Ventas en espera)
 interface SuspendedTicket {
   id: number;
   label: string;
@@ -46,7 +47,7 @@ interface SuspendedTicket {
   customerId: string;
 }
 
-// Decimal precision helper for retail money math
+// Decimal precision helper for retail UI calculations
 function round2(num: number): number {
   return Math.round((num + Number.EPSILON) * 100) / 100;
 }
@@ -82,7 +83,7 @@ export function TerminalClient({
     warehouses.find((w) => w.branch_id === selectedBranchId)?.id || warehouses.find((w) => w.is_default)?.id || warehouses[0]?.id || ""
   );
 
-  // Multi-cart state (Ventas en espera / Parked sales)
+  // Multi-cart state (TEMPORARY IMPLEMENTATION: 3 in-memory tickets)
   const [activeTicketId, setActiveTicketId] = useState<number>(1);
   const [tickets, setTickets] = useState<SuspendedTicket[]>([
     { id: 1, label: "Ticket 1", cart: [], customerId: "" },
@@ -105,7 +106,16 @@ export function TerminalClient({
     cashRegisters.find((r) => r.branch_id === selectedBranchId)?.id || cashRegisters[0]?.id || ""
   );
   const [openingAmount, setOpeningAmount] = useState<number>(0);
+
+  // Blind Cash Count State (Arqueo Ciego)
   const [declaredCash, setDeclaredCash] = useState<number>(0);
+  const [closeNotes, setCloseNotes] = useState<string>("");
+  const [useDenominations, setUseDenominations] = useState<boolean>(false);
+  const [denominations, setDenominations] = useState<{ [key: string]: number }>({
+    b200: 0, b100: 0, b50: 0, b20: 0, b10: 0,
+    m5: 0, m2: 0, m1: 0, m050: 0, m020: 0, m010: 0
+  });
+  const [lastCloseResult, setLastCloseResult] = useState<any>(null);
 
   // Payment modal state (Mixed Payments UI)
   const [showPayModal, setShowPayModal] = useState(false);
@@ -133,6 +143,9 @@ export function TerminalClient({
           focusSearchInput();
         } else if (showCloseModal) {
           setShowCloseModal(false);
+          focusSearchInput();
+        } else if (lastCloseResult) {
+          setLastCloseResult(null);
           focusSearchInput();
         } else if (lastSaleResult) {
           setLastSaleResult(null);
@@ -163,7 +176,7 @@ export function TerminalClient({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showPayModal, showCloseModal, lastSaleResult, search, cart, activeSession, focusSearchInput]);
+  }, [showPayModal, showCloseModal, lastCloseResult, lastSaleResult, search, cart, activeSession, focusSearchInput]);
 
   // Cart Calculations
   const subtotal = round2(cart.reduce((acc, item) => acc + (item.product.price * item.quantity - item.discount), 0));
@@ -177,6 +190,29 @@ export function TerminalClient({
   // Mixed mode sum calculations
   const mixedPaidTotal = round2(paymentLines.reduce((acc, line) => acc + (Number(line.amount) || 0), 0));
   const mixedRemaining = round2(total - mixedPaidTotal);
+
+  // Denominations sum helper
+  const calculateDenominationsTotal = (denoms: { [key: string]: number }) => {
+    const sum =
+      (denoms.b200 || 0) * 200 +
+      (denoms.b100 || 0) * 100 +
+      (denoms.b50 || 0) * 50 +
+      (denoms.b20 || 0) * 20 +
+      (denoms.b10 || 0) * 10 +
+      (denoms.m5 || 0) * 5 +
+      (denoms.m2 || 0) * 2 +
+      (denoms.m1 || 0) * 1 +
+      (denoms.m050 || 0) * 0.50 +
+      (denoms.m020 || 0) * 0.20 +
+      (denoms.m010 || 0) * 0.10;
+    return round2(sum);
+  };
+
+  const updateDenomination = (key: string, count: number) => {
+    const next = { ...denominations, [key]: Math.max(0, count) };
+    setDenominations(next);
+    setDeclaredCash(calculateDenominationsTotal(next));
+  };
 
   // Cart mutators updating current active ticket
   const updateCurrentTicket = (updater: (prev: SuspendedTicket) => SuspendedTicket) => {
@@ -271,7 +307,6 @@ export function TerminalClient({
         setSuccessMsg(`Agregado: ${exactMatch.name}`);
         setTimeout(() => setSuccessMsg(null), 2000);
       } else {
-        // If 1 filtered product matches name
         const matches = products.filter((p) => p.name.toLowerCase().includes(q));
         if (matches.length === 1) {
           addToCart(matches[0]);
@@ -371,7 +406,6 @@ export function TerminalClient({
         },
       ];
     } else {
-      // Mixed mode validation
       if (Math.abs(mixedRemaining) > 0.01) {
         setErrorMsg(`La suma de pagos (S/ ${mixedPaidTotal.toFixed(2)}) no coincide con el total (S/ ${total.toFixed(2)}). Diferencia: S/ ${mixedRemaining.toFixed(2)}`);
         return;
@@ -444,22 +478,24 @@ export function TerminalClient({
     });
   };
 
-  // Close Session Handler
+  // Close Session Handler (Blind Cash Count Protocol)
   const handleCloseSession = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!activeSession) return;
     setErrorMsg(null);
     startTransition(async () => {
       try {
-        await closeCashSession({
+        const res = await closeCashSession({
           companyId,
           sessionId: activeSession.id,
-          declaredCash,
+          declaredCash: Number(declaredCash) || 0,
+          notes: closeNotes || null,
         });
         setShowCloseModal(false);
-        setShowOpenModal(true);
+        setLastCloseResult(res.data);
         router.refresh();
       } catch (err: any) {
-        setErrorMsg(err.message);
+        setErrorMsg(err.message || "Error al cerrar el turno de caja.");
       }
     });
   };
@@ -483,7 +519,7 @@ export function TerminalClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {activeSession
-                ? `Caja: ${activeSession.cash_registers?.name || "General"} | Esperado en caja: S/ ${Number(activeSession.expected_cash).toFixed(2)}`
+                ? `Caja: ${activeSession.cash_registers?.name || "General"} | Turno activo desde: ${new Date(activeSession.opened_at).toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}`
                 : "Abre un turno de caja para emitir ventas"}
             </p>
           </div>
@@ -501,12 +537,13 @@ export function TerminalClient({
           {activeSession ? (
             <button
               onClick={() => {
-                setDeclaredCash(Number(activeSession.expected_cash));
+                setDeclaredCash(0);
+                setCloseNotes("");
                 setShowCloseModal(true);
               }}
               className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-border text-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
             >
-              Cerrar Turno (Arqueo)
+              Cerrar Turno (Arqueo Ciego)
             </button>
           ) : (
             <button
@@ -607,7 +644,7 @@ export function TerminalClient({
 
         {/* Right: Cart, Parked Tickets & Checkout */}
         <div className="lg:col-span-5 rounded-2xl border border-border bg-card shadow-sm p-4 space-y-4">
-          {/* Parked Tickets Bar (Ventas en espera) */}
+          {/* Parked Tickets Bar (TEMPORARY IMPLEMENTATION: 3 in-memory tickets) */}
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-1.5">
               {tickets.map((t) => {
@@ -795,61 +832,214 @@ export function TerminalClient({
         </div>
       )}
 
-      {/* MODAL: Cerrar Turno de Caja (Arqueo) */}
+      {/* MODAL: CIERRE Y ARQUEO CIEGO DE CAJA (BLIND CASH COUNT) */}
       {showCloseModal && activeSession && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="font-bold text-lg text-foreground">Cierre y Arqueo de Turno</h3>
-            <div className="p-3 rounded-lg bg-muted/40 space-y-1 text-sm">
+          <div className="bg-card border border-border rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="border-b border-border pb-3">
+              <h3 className="font-bold text-lg text-foreground">Cierre y Arqueo Ciego de Caja</h3>
+              <p className="text-xs text-muted-foreground">
+                Ingresa el conteo físico de dinero en caja. Por control interno, el sistema comparará tu declaración con el saldo del sistema tras la confirmación.
+              </p>
+            </div>
+
+            {/* Turn metadata (No financial expected totals) */}
+            <div className="p-3 rounded-xl bg-muted/30 border border-border space-y-1 text-xs">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Monto de Apertura:</span>
-                <span className="font-semibold">S/ {Number(activeSession.opening_amount).toFixed(2)}</span>
+                <span className="text-muted-foreground">Caja:</span>
+                <span className="font-semibold text-foreground">{activeSession.cash_registers?.name || "General"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Efectivo Esperado:</span>
-                <span className="font-bold text-primary">S/ {Number(activeSession.expected_cash).toFixed(2)}</span>
+                <span className="text-muted-foreground">Hora de Apertura:</span>
+                <span className="font-semibold text-foreground">{new Date(activeSession.opened_at).toLocaleString("es-PE")}</span>
               </div>
             </div>
 
             <form onSubmit={handleCloseSession} className="space-y-4">
+              {/* Denomination Counter Toggle */}
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-semibold text-foreground">
+                  Efectivo Físico Declarado (S/)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setUseDenominations(!useDenominations)}
+                  className="text-xs text-primary font-bold hover:underline"
+                >
+                  {useDenominations ? "Ingreso directo de monto" : "Desglosar por billetes/monedas"}
+                </button>
+              </div>
+
+              {useDenominations ? (
+                <div className="space-y-3 p-3 bg-muted/20 border border-border rounded-xl">
+                  <div>
+                    <span className="text-[11px] font-bold text-muted-foreground block mb-1">Billetes</span>
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {[
+                        { key: "b200", label: "S/ 200" },
+                        { key: "b100", label: "S/ 100" },
+                        { key: "b50", label: "S/ 50" },
+                        { key: "b20", label: "S/ 20" },
+                        { key: "b10", label: "S/ 10" },
+                      ].map((b) => (
+                        <div key={b.key} className="text-center">
+                          <label className="text-[10px] text-muted-foreground block">{b.label}</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={denominations[b.key] || ""}
+                            placeholder="0"
+                            onChange={(e) => updateDenomination(b.key, parseInt(e.target.value) || 0)}
+                            className="w-full text-center px-1 py-1 text-xs rounded border border-border bg-background font-bold"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-bold text-muted-foreground block mb-1">Monedas</span>
+                    <div className="grid grid-cols-6 gap-1">
+                      {[
+                        { key: "m5", label: "S/ 5" },
+                        { key: "m2", label: "S/ 2" },
+                        { key: "m1", label: "S/ 1" },
+                        { key: "m050", label: "0.50" },
+                        { key: "m020", label: "0.20" },
+                        { key: "m010", label: "0.10" },
+                      ].map((m) => (
+                        <div key={m.key} className="text-center">
+                          <label className="text-[10px] text-muted-foreground block">{m.label}</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={denominations[m.key] || ""}
+                            placeholder="0"
+                            onChange={(e) => updateDenomination(m.key, parseInt(e.target.value) || 0)}
+                            className="w-full text-center px-1 py-1 text-xs rounded border border-border bg-background font-bold"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2 border-t border-border">
+                    <span className="text-xs font-semibold">Total Calculado:</span>
+                    <span className="text-base font-black text-primary">S/ {declaredCash.toFixed(2)}</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="number"
+                    step="0.10"
+                    min="0"
+                    placeholder="0.00"
+                    value={declaredCash || ""}
+                    onChange={(e) => setDeclaredCash(Number(e.target.value))}
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-background text-xl font-black text-foreground text-center"
+                    required
+                    autoFocus
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                  Efectivo Real en Caja (Declarado)
+                  Observaciones / Motivo (Opcional)
                 </label>
-                <input
-                  type="number"
-                  step="0.10"
-                  min="0"
-                  value={declaredCash}
-                  onChange={(e) => setDeclaredCash(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm font-bold"
-                  required
+                <textarea
+                  value={closeNotes}
+                  onChange={(e) => setCloseNotes(e.target.value)}
+                  placeholder="Comentarios sobre el turno o incidencias..."
+                  rows={2}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-border bg-background"
                 />
               </div>
 
-              {declaredCash !== Number(activeSession.expected_cash) && (
-                <p className="text-xs font-medium text-warning">
-                  Diferencia detectada: S/ {(declaredCash - Number(activeSession.expected_cash)).toFixed(2)}
-                </p>
-              )}
+              <div className="p-2.5 rounded-lg bg-warning/10 border border-warning/20 text-warning text-xs font-medium">
+                ⚠️ Advertencia: Una vez confirmado el cierre no se podrán emitir más ventas en este turno.
+              </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowCloseModal(false)}
-                  className="px-4 py-2 text-xs font-semibold border border-border rounded-lg"
+                  disabled={isPending}
+                  className="px-4 py-2.5 text-xs font-semibold border border-border rounded-xl"
                 >
-                  Cancelar
+                  Cancelar [ESC]
                 </button>
                 <button
                   type="submit"
-                  disabled={isPending}
-                  className="px-4 py-2 text-xs font-semibold bg-destructive text-destructive-foreground rounded-lg"
+                  disabled={isPending || declaredCash < 0}
+                  className="px-5 py-2.5 text-xs font-bold bg-destructive text-destructive-foreground rounded-xl shadow hover:bg-destructive/90 disabled:opacity-50"
                 >
-                  {isPending ? "Cerrando..." : "Confirmar Cierre"}
+                  {isPending ? "Conciliando..." : "Declarar y Cerrar Turno"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: RESULTADO DE RECONCILIACIÓN DE TURNO (POST-CIERRE) */}
+      {lastCloseResult && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-center">
+            <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto text-xl font-black">
+              📊
+            </div>
+            <h3 className="font-bold text-lg text-foreground">Turno Cerrado y Conciliado</h3>
+            <p className="text-xs text-muted-foreground">
+              El arqueo ha sido registrado en base de datos de forma inmutable.
+            </p>
+
+            <div className="p-4 rounded-xl bg-muted/40 border border-border text-left space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Efectivo Físico Declarado:</span>
+                <span className="font-bold text-foreground">S/ {Number(lastCloseResult.declared_cash).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Efectivo Esperado (Sistema):</span>
+                <span className="font-bold text-foreground">S/ {Number(lastCloseResult.expected_cash).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-border font-bold text-sm">
+                <span>Diferencia:</span>
+                <span className={
+                  Number(lastCloseResult.difference) === 0
+                    ? "text-success font-black"
+                    : Number(lastCloseResult.difference) > 0
+                    ? "text-warning font-black"
+                    : "text-destructive font-black"
+                }>
+                  {Number(lastCloseResult.difference) === 0
+                    ? "S/ 0.00 (Cuadrada)"
+                    : Number(lastCloseResult.difference) > 0
+                    ? `+S/ ${Number(lastCloseResult.difference).toFixed(2)} (Sobrante)`
+                    : `-S/ ${Math.abs(Number(lastCloseResult.difference)).toFixed(2)} (Faltante)`}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-center pt-3 flex-wrap">
+              <Link
+                href={`/app/pos/cash-sessions/${lastCloseResult.id}/summary`}
+                target="_blank"
+                className="px-4 py-2.5 text-xs font-bold bg-primary text-primary-foreground rounded-xl shadow hover:bg-primary/90"
+              >
+                Imprimir Comprobante de Cierre
+              </Link>
+              <button
+                onClick={() => {
+                  setLastCloseResult(null);
+                  setShowOpenModal(true);
+                }}
+                className="px-4 py-2.5 text-xs font-semibold border border-border rounded-xl hover:bg-muted"
+              >
+                Abrir Nuevo Turno
+              </button>
+            </div>
           </div>
         </div>
       )}

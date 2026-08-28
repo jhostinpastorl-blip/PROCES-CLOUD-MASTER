@@ -30,9 +30,9 @@ export default async function PosCashSessionsPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-foreground">Turnos de Caja</h2>
+          <h2 className="text-xl font-bold text-foreground">Turnos y Arqueos de Caja</h2>
           <p className="text-sm text-muted-foreground">
-            Aperturas, cierres, arqueos y control de efectivo por caja y sucursal.
+            Aperturas, cierres a ciegas, conciliación de efectivo y comprobantes imprimibles por turno.
           </p>
         </div>
         <Link
@@ -52,14 +52,26 @@ export default async function PosCashSessionsPage() {
               <th className="px-4 py-3">Cierre</th>
               <th className="px-4 py-3 text-right">Monto Inicial</th>
               <th className="px-4 py-3 text-right">Efectivo Esperado</th>
-              <th className="px-4 py-3 text-right">Declarado</th>
+              <th className="px-4 py-3 text-right">Declarado Físico</th>
               <th className="px-4 py-3 text-right">Diferencia</th>
               <th className="px-4 py-3 text-center">Estado</th>
+              <th className="px-4 py-3 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border font-medium">
             {sessions?.map((s: any) => {
-              const hasDiff = s.difference !== null && Number(s.difference) !== 0;
+              const diff = s.difference !== null ? Number(s.difference) : null;
+              let diffBadge = <span className="text-muted-foreground">-</span>;
+              if (diff !== null) {
+                if (diff === 0) {
+                  diffBadge = <span className="text-success font-bold">S/ 0.00 (Cuadrada)</span>;
+                } else if (diff > 0) {
+                  diffBadge = <span className="text-warning font-bold">+S/ {diff.toFixed(2)} (Sobrante)</span>;
+                } else {
+                  diffBadge = <span className="text-destructive font-bold">-S/ {Math.abs(diff).toFixed(2)} (Faltante)</span>;
+                }
+              }
+
               return (
                 <tr key={s.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3">
@@ -70,7 +82,7 @@ export default async function PosCashSessionsPage() {
                     {new Date(s.opened_at).toLocaleString("es-PE")}
                   </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">
-                    {s.closed_at ? new Date(s.closed_at).toLocaleString("es-PE") : "En curso..."}
+                    {s.closed_at ? new Date(s.closed_at).toLocaleString("es-PE") : <span className="text-primary font-bold">En curso...</span>}
                   </td>
                   <td className="px-4 py-3 text-right">
                     S/ {Number(s.opening_amount).toFixed(2)}
@@ -81,20 +93,28 @@ export default async function PosCashSessionsPage() {
                   <td className="px-4 py-3 text-right">
                     {s.declared_cash !== null ? `S/ ${Number(s.declared_cash).toFixed(2)}` : "-"}
                   </td>
-                  <td className={`px-4 py-3 text-right font-bold ${hasDiff ? "text-warning" : "text-muted-foreground"}`}>
-                    {s.difference !== null ? `S/ ${Number(s.difference).toFixed(2)}` : "-"}
+                  <td className="px-4 py-3 text-right text-xs">
+                    {diffBadge}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <StatusChip tone={s.status === "open" ? "success" : "neutral"}>
                       {s.status === "open" ? "Abierto" : "Cerrado"}
                     </StatusChip>
                   </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link
+                      href={`/app/pos/cash-sessions/${s.id}/summary`}
+                      className="px-2.5 py-1 text-xs font-semibold rounded-md border border-border bg-background hover:bg-muted text-foreground transition-colors inline-block"
+                    >
+                      Resumen / Ticket
+                    </Link>
+                  </td>
                 </tr>
               );
             })}
             {(!sessions || sessions.length === 0) && (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground text-sm">
+                <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground text-sm">
                   No hay turnos de caja registrados.
                 </td>
               </tr>
