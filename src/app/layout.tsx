@@ -10,7 +10,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body>
         <ThemeInit />
-        <div id="main-content">{children}</div>
+        <a className="skip-link" href="#main-content">
+          Saltar al contenido
+        </a>
+        <div id="main-content" tabIndex={-1}>{children}</div>
       </body>
     </html>
   );
