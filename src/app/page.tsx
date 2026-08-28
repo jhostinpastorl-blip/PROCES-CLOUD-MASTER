@@ -35,38 +35,40 @@ const faqs = [
 export default function Home() {
   return (
     <main className="landing-final">
-      {/* HEADER PÚBLICO */}
-      <header className="landing-nav">
-        <Link href="/" className="landing-brand" aria-label="PROCESA Cloud Inicio">
-          <ProcesaLogo />
-        </Link>
-        <nav aria-label="Navegación principal">
-          <a href="#soluciones">Soluciones</a>
-          <a href="#ecosistema">Ecosistema</a>
-          <a href="#como-funciona">Cómo funciona</a>
-          <a href="#multiempresa">Multiempresa</a>
-          <a href="#planes">Planes</a>
-          <a href="#seguridad">Seguridad</a>
-          <a href="#faq">FAQ</a>
-        </nav>
-        <div className="landing-actions">
-          <ThemeToggle />
-          <a
-            className="corp-link"
-            href="https://www.procesacorp.com/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            PROCESA CORP ↗
-          </a>
-          <Link className="nav-login" href="/login">
-            Iniciar sesión
+      {/* HEADER PÚBLICO FLOTANTE GLASS */}
+      <div className="landing-nav-wrapper">
+        <header className="landing-nav glass-header">
+          <Link href="/" className="landing-brand" aria-label="PROCESA Cloud Inicio">
+            <ProcesaLogo />
           </Link>
-          <Link className="pc-btn pc-btn-primary pc-btn-sm" href="/demo">
-            Solicitar demo
-          </Link>
-        </div>
-      </header>
+          <nav aria-label="Navegación principal">
+            <a href="#soluciones">Soluciones</a>
+            <a href="#ecosistema">Ecosistema</a>
+            <a href="#como-funciona">Cómo funciona</a>
+            <a href="#multiempresa">Multiempresa</a>
+            <a href="#planes">Planes</a>
+            <a href="#seguridad">Seguridad</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+          <div className="landing-actions">
+            <ThemeToggle />
+            <a
+              className="corp-link"
+              href="https://www.procesacorp.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              PROCESA CORP ↗
+            </a>
+            <Link className="nav-login" href="/login">
+              Iniciar sesión
+            </Link>
+            <Link className="pc-btn pc-btn-primary pc-btn-sm header-cta-btn" href="/demo">
+              Solicitar demo
+            </Link>
+          </div>
+        </header>
+      </div>
 
       {/* HERO V2: CARRUSEL MULTIPRODUCTO ESTRATÉGICO */}
       <section className="hero-final">

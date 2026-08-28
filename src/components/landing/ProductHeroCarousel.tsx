@@ -116,89 +116,91 @@ export function ProductHeroCarousel() {
 
         {/* COLUMNA DERECHA: VENTANA DE PRODUCTO ENTERPRISE */}
         <div className="hero-slide-visual">
-          <div className="mockup-frame">
-            {/* BARRA SUPERIOR DE VENTANA */}
-            <div className="mockup-chrome">
-              <div className="chrome-controls">
-                <span className="dot dot-red" />
-                <span className="dot dot-yellow" />
-                <span className="dot dot-green" />
-              </div>
-              <div className="chrome-url">
-                <span className="lock-icon">🔒</span>
-                <span>app.procesacloud.com/{currentProduct.id}</span>
-              </div>
-              <span className="chrome-badge-interactive">{currentProduct.visual.badgeText}</span>
-            </div>
-
-            {/* CUERPO INTERNO ESTILO APLICACIÓN */}
-            <div className="mockup-body">
-              {/* HEADER DE LA APP */}
-              <div className="mockup-app-topbar">
-                <div className="app-tenant-badge">
-                  <span className="tenant-dot" />
-                  <strong>Corporación Los Cedros SAC</strong>
-                  <span className="tenant-branch">· Sede Principal</span>
+          <div className="mockup-shell">
+            <div className="mockup-frame">
+              {/* BARRA SUPERIOR DE VENTANA */}
+              <div className="mockup-chrome">
+                <div className="chrome-controls">
+                  <span className="dot dot-red" />
+                  <span className="dot dot-yellow" />
+                  <span className="dot dot-green" />
                 </div>
-                <div className="app-module-badge">
-                  <span className="module-tag">{currentProduct.shortName}</span>
+                <div className="chrome-url">
+                  <span className="lock-icon">🔒</span>
+                  <span>app.procesacloud.com/{currentProduct.id}</span>
                 </div>
+                <span className="chrome-badge-interactive">{currentProduct.visual.badgeText}</span>
               </div>
 
-              {/* TÍTULO Y CONTEXTO */}
-              <div className="mockup-header">
-                <div>
-                  <span className="kicker-lead">MÓDULO EN EJECUCIÓN</span>
-                  <h3 className="mockup-title">{currentProduct.visual.title}</h3>
-                  <p className="mockup-subtitle">{currentProduct.visual.subtitle}</p>
+              {/* CUERPO INTERNO ESTILO APLICACIÓN */}
+              <div className="mockup-body">
+                {/* HEADER DE LA APP */}
+                <div className="mockup-app-topbar">
+                  <div className="app-tenant-badge">
+                    <span className="tenant-dot" />
+                    <strong>Corporación Los Cedros SAC</strong>
+                    <span className="tenant-branch">· Sede Principal</span>
+                  </div>
+                  <div className="app-module-badge">
+                    <span className="module-tag">{currentProduct.shortName}</span>
+                  </div>
+                </div>
+
+                {/* TÍTULO Y CONTEXTO */}
+                <div className="mockup-header">
+                  <div>
+                    <span className="kicker-lead">MÓDULO EN EJECUCIÓN</span>
+                    <h3 className="mockup-title">{currentProduct.visual.title}</h3>
+                    <p className="mockup-subtitle">{currentProduct.visual.subtitle}</p>
+                  </div>
+                </div>
+
+                {/* GRID DE KPIs */}
+                <div className="mockup-metrics-grid">
+                  <div className="metric-card metric-primary">
+                    <span className="metric-lbl">{currentProduct.visual.metricMain.label}</span>
+                    <strong className="metric-val">{currentProduct.visual.metricMain.value}</strong>
+                    {currentProduct.visual.metricMain.delta && (
+                      <span className="metric-delta">{currentProduct.visual.metricMain.delta}</span>
+                    )}
+                  </div>
+                  <div className="metric-card">
+                    <span className="metric-lbl">{currentProduct.visual.metricSecondary.label}</span>
+                    <b className="metric-subval">{currentProduct.visual.metricSecondary.value}</b>
+                  </div>
+                  <div className="metric-card">
+                    <span className="metric-lbl">{currentProduct.visual.metricTertiary.label}</span>
+                    <b className="metric-subval">{currentProduct.visual.metricTertiary.value}</b>
+                  </div>
+                </div>
+
+                {/* SIMULADOR DE EVENTOS EN VIVO */}
+                <div className="mockup-stream">
+                  <div className="stream-header-row">
+                    <span className="stream-title">Actividad operativa en tiempo real</span>
+                    <span className="stream-live-indicator">
+                      <i className="pulse-beacon" /> En vivo
+                    </span>
+                  </div>
+                  <div className="stream-events-list">
+                    {currentProduct.visual.streamItems.map((st, i) => (
+                      <div key={i} className="stream-event-item">
+                        <span className="stream-event-tag">{st.tag}</span>
+                        <span className="stream-event-text">{st.text}</span>
+                        <small className="stream-event-time">{st.time}</small>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* GRID DE KPIs */}
-              <div className="mockup-metrics-grid">
-                <div className="metric-card metric-primary">
-                  <span className="metric-lbl">{currentProduct.visual.metricMain.label}</span>
-                  <strong className="metric-val">{currentProduct.visual.metricMain.value}</strong>
-                  {currentProduct.visual.metricMain.delta && (
-                    <span className="metric-delta">{currentProduct.visual.metricMain.delta}</span>
-                  )}
-                </div>
-                <div className="metric-card">
-                  <span className="metric-lbl">{currentProduct.visual.metricSecondary.label}</span>
-                  <b className="metric-subval">{currentProduct.visual.metricSecondary.value}</b>
-                </div>
-                <div className="metric-card">
-                  <span className="metric-lbl">{currentProduct.visual.metricTertiary.label}</span>
-                  <b className="metric-subval">{currentProduct.visual.metricTertiary.value}</b>
-                </div>
+              {/* PIE DE VENTANA */}
+              <div className="mockup-footer">
+                <span className="footer-brand-label">PROCESA Cloud · Ecosistema Empresarial de PROCESA CORP</span>
+                <a href="#soluciones" className="mockup-detail-link">
+                  Explorar catálogo →
+                </a>
               </div>
-
-              {/* SIMULADOR DE EVENTOS EN VIVO */}
-              <div className="mockup-stream">
-                <div className="stream-header-row">
-                  <span className="stream-title">Actividad operativa en tiempo real</span>
-                  <span className="stream-live-indicator">
-                    <i className="pulse-beacon" /> En vivo
-                  </span>
-                </div>
-                <div className="stream-events-list">
-                  {currentProduct.visual.streamItems.map((st, i) => (
-                    <div key={i} className="stream-event-item">
-                      <span className="stream-event-tag">{st.tag}</span>
-                      <span className="stream-event-text">{st.text}</span>
-                      <small className="stream-event-time">{st.time}</small>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* PIE DE VENTANA */}
-            <div className="mockup-footer">
-              <span className="footer-brand-label">PROCESA Cloud · Ecosistema Empresarial de PROCESA CORP</span>
-              <a href="#soluciones" className="mockup-detail-link">
-                Explorar catálogo →
-              </a>
             </div>
           </div>
         </div>
