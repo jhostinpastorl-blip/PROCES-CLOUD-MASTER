@@ -49,6 +49,22 @@ El efecto glass utiliza transparencia, borde fino y desenfoque. Debe conservar c
 - **Dashboard:** sidebar oscuro, barra superior contextual, KPIs escaneables y una banda específica para Viernes.
 - **Estados:** texto y símbolo acompañan al color; ningún estado se comunica solo mediante color.
 
+### Material interactivo
+
+Los controles comparten un ADN óptico sin perder jerarquía:
+
+- **Primary premium:** gradiente azul–violeta–magenta, bisel interno, reflejo superior, glow contenido y respiración lumínica lenta.
+- **Secondary glass:** superficie translúcida del tema, borde fino, bevel y sombra suave; nunca replica el gradiente primario.
+- **Tertiary / ghost:** menor elevación y contraste suficiente para acciones de apoyo.
+- **Navigation control:** superficie glass direccional para anterior/siguiente y movimiento de flecha de 2 px.
+- **Icon control:** objetivo táctil mínimo de 44 px y foco visible.
+
+El shimmer realiza una única pasada en hover. En active, el control reduce escala y sombra externa para comunicar presión. Radios, bordes, highlights, sombras y easing se consumen mediante tokens compartidos; no se recrean por componente.
+
+### Marca sensible al tema
+
+El lockup automático utiliza una sola ranura de asset. OFF carga exclusivamente `/brand/logo-off.png` (amarillo/dorado) y ON carga exclusivamente `/brand/logo-on.png` (navy). No se renderizan ambas variantes para alternarlas con opacidad, ni se aplican filtros de color.
+
 ## Espaciado, radios y profundidad
 
 La escala espacial base es de 4 px, con intervalos preferidos de 8, 12, 16, 24, 32, 48 y 64 px. Los radios se agrupan en 12 px para controles, 18–24 px para tarjetas y 28–32 px para contenedores protagonistas. Las sombras se reservan para separar niveles y nunca deben producir halos que reduzcan la lectura.

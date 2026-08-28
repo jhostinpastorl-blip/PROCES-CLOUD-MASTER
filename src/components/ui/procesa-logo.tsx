@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 
 interface ProcesaLogoProps {
   compact?: boolean;
@@ -65,28 +66,18 @@ export function ProcesaLogo({
     );
   }
 
-  // Auto variant: responds dynamically to html[data-theme="dark"]
+  // Auto variant: a single official asset slot is switched by data-theme.
+  // This avoids rendering both brand marks at once and prevents ghosting.
   return (
     <div className={`brand-lockup brand-lockup-auto ${className}`}>
-      <span className="brand-art">
-        {/* In Light Mode: show Navy logo */}
-        <Image
-          className="logo-light"
-          src="/brand/logo-on.png"
-          width={width}
-          height={height}
-          alt="PROCESA Cloud"
-          priority
-        />
-        {/* In Dark Mode: show Yellow logo */}
-        <Image
-          className="logo-dark"
-          src="/brand/logo-off.png"
-          width={width}
-          height={height}
-          alt="PROCESA Cloud"
-          priority
-        />
+      <span
+        className="brand-art brand-art-auto"
+        style={{
+          "--brand-logo-width": `${width}px`,
+          "--brand-logo-height": `${height}px`,
+        } as CSSProperties}
+      >
+        <span className="brand-logo-asset" role="img" aria-label="PROCESA Cloud" />
       </span>
       {!compact && (
         <span className="brand-text">
