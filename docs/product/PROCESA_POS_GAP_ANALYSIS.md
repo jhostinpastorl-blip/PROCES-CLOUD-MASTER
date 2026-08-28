@@ -49,3 +49,23 @@ Este documento compara el estado actual de implementación en **PROCESA Cloud (F
 4. **QUÉ DEBEMOS RECHAZAR OBLIGATORIAMENTE:**
    - Todo código con secretos hardcodeados o sesiones mono-empresa sin JWT.
    - Tablas MySQL con claves autoincrementales sin `company_id` ni `branch_id`.
+
+---
+
+============================================================
+4. HALLAZGOS Y EVIDENCIAS DE LA AUDITORÍA ETAPA 7A
+============================================================
+Tras la inspección profunda de los 34 archivos en `src/app/app/pos/`, las 26 Server Actions y las 70 migraciones de base de datos se concluye:
+
+1. **El Motor RPC `create_pos_sale` ya soporta Cobro Mixto en Base de Datos:**
+   El parámetro `p_payments` recibe un array de objetos (`payment_method`, `amount`, `reference`). El backend ya está preparado; la brecha está localizada en el componente de cliente `src/app/app/pos/terminal/terminal-client.tsx`, cuya UI actual limitaba la selección a 1 solo medio de pago.
+
+2. **La concurrencia y bloqueo de stock ya están resueltos:**
+   La función PL/pgSQL ejecuta `FOR UPDATE` sobre `inventory_levels` antes de descontar stock y generar el movimiento de Kardex, evitando sobregiro de inventario en cajas simultáneas.
+
+3. **La brecha principal de Caja es de Control Interno (Arqueo Ciego):**
+   El modal de cierre en `cash-sessions` muestra el monto esperado calculado. La adaptación requerida para ETAPA 7C es cambiar el flujo para que el cajero ingrese su arqueo físico a ciegas y sea el sistema (o el supervisor) quien calcule y registre las discrepancias en el Ticket Z.
+
+4. **La brecha de Devoluciones es de Conexión Fiscal:**
+   `createSaleReturnAction` ya revierte el inventario y descuenta la caja en PostgreSQL; en ETAPA 7E únicamente se debe invocar el servicio de emisión de Nota de Crédito Electrónica Tipo 07 ya existente en `src/lib/cpe/`.
+
