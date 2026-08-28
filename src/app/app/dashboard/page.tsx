@@ -91,25 +91,39 @@ export default async function Dashboard() {
 
           <section className="stats-grid real-stats">
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">⌘</i>
               <span>Sucursales activas</span>
               <strong>{branchCount}</strong>
               <small>{subData?.plan?.max_branches ? `Límite: ${subData.plan.max_branches}` : "Sin límite"}</small>
             </article>
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">◎</i>
               <span>Usuarios activos</span>
               <strong>{userCount}</strong>
               <small>{subData?.plan?.max_users ? `Límite: ${subData.plan.max_users}` : "Sin límite"}</small>
             </article>
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">▦</i>
               <span>Módulos activos</span>
               <strong>{moduleCount}</strong>
               <small>Capacidades habilitadas</small>
             </article>
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">◌</i>
               <span>Notificaciones</span>
               <strong>{noticeCount}</strong>
               <small>Pendientes de lectura</small>
             </article>
+          </section>
+
+          <section className="dashboard-command-band" aria-label="Asistente Viernes">
+            <div className="viernes-command-mark" aria-hidden="true">✦</div>
+            <div>
+              <span>VIERNES · ASISTENCIA EMPRESARIAL</span>
+              <h3>Convierte el contexto de tu operación en respuestas útiles.</h3>
+              <p>Consulta información según la empresa activa, la sucursal y tus permisos disponibles.</p>
+            </div>
+            <Link className="pc-btn pc-btn-secondary pc-btn-md" href="/app/viernes">Abrir Viernes →</Link>
           </section>
 
           <section className="real-dashboard-grid">
