@@ -34,6 +34,20 @@ export const firstBranchSchema=z.object({
   code:branchCodeSchema.transform(v=>v.toUpperCase())
 });
 
+export const onboardingProfileSchema=z.object({
+  fullName:z.string().trim().min(2).max(120),
+  phone:z.string().trim().max(30).optional(),
+  jobTitle:z.string().trim().max(100).optional()
+});
+
+export const businessDiscoverySchema=z.object({
+  industry:z.enum(["bodega","ferreteria","minimarket","panaderia","restaurante","gimnasio","veterinaria","servicios","otro"]),
+  primaryNeed:z.enum(["sales","inventory","cash","purchases","employees","accounting","documents","collections"]),
+  selectedNeeds:z.array(z.enum(["sales","inventory","cash","purchases","employees","accounting","documents","collections"])).min(1).max(8),
+  employeeRange:z.enum(["1","2-5","6-20","21-50","51+"]),
+  branchRange:z.enum(["1","2-3","4-10","11+"])
+});
+
 export const invitationSchema=z.object({
   companyId:companyIdSchema,
   email:emailSchema,
