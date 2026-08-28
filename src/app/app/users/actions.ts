@@ -42,17 +42,27 @@ export async function inviteUser(f: FormData) {
     throw error;
   }
 
+  let deliveryStatus: "SENT" | "FAILED" = "SENT";
+  let deliveryErrorCode: string | null = null;
   try {
     const admin = createAdminClient();
     const url = `${process.env.NEXT_PUBLIC_APP_URL}/aceptar-invitacion?token=${encodeURIComponent(t.raw)}`;
-    await admin.auth.admin.inviteUserByEmail(p.email, { redirectTo: url });
+    const { error: deliveryError } = await admin.auth.admin.inviteUserByEmail(p.email, { redirectTo: url });
+    if (deliveryError) throw deliveryError;
   } catch (mailErr) {
-    console.warn("SMTP / Email notification skipped (provider pending setup):", mailErr);
+    deliveryStatus = "FAILED";
+    deliveryErrorCode = mailErr instanceof Error ? mailErr.name : "EMAIL_PROVIDER_ERROR";
   }
+
+  await s.from("company_invitations").update({
+    delivery_status: deliveryStatus,
+    delivery_error_code: deliveryErrorCode,
+    last_sent_at: deliveryStatus === "SENT" ? new Date().toISOString() : null,
+  }).eq("id", data).eq("company_id", p.companyId);
 
   await audit(p.companyId, "user.invited", "company_invitation", data, {
     email: p.email,
-    roleId: p.roleId || null,
+    roleId: p.roleId || null, deliveryStatus,
   });
 
   revalidatePath("/app/users");

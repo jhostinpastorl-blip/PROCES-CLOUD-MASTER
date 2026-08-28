@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { setCompanyModule } from "./actions";
 import { StatusChip } from "@/components/ui/status-chip";
 import { EmptyState } from "@/components/ui/empty-state";
-import { getCompanySubscription } from "@/lib/plans/limits";
+import { getEffectiveEntitlements } from "@/lib/entitlements/effective";
 
 export default async function Modules() {
   const companies = await getCompanyContexts();
@@ -21,8 +21,8 @@ export default async function Modules() {
       </div>
       {await Promise.all(
         companies.map(async (c) => {
-          const sub = await getCompanySubscription(c.companyId);
-          const entitledCodes = new Set((sub?.plan as any)?.module_codes ?? ["core"]);
+          const entitlements = await getEffectiveEntitlements(c.companyId);
+          const entitledCodes = new Set(entitlements.effectiveModuleCodes);
           const { data: enabled } = await s
             .from("company_modules")
             .select("module_id,enabled")
@@ -37,7 +37,7 @@ export default async function Modules() {
                   <span>EMPRESA</span>
                   <h3>{c.companyName}</h3>
                   <p>
-                    {activeIds.size} módulos activos · Plan: <b>{sub?.plan?.name ?? "Free"}</b>
+                    {activeIds.size} módulos activos · Plan: <b>{entitlements.plan?.name ?? "Free"}</b> · {entitlements.activations.length} soluciones
                   </p>
                 </div>
                 {canManage ? (
@@ -78,7 +78,7 @@ export default async function Modules() {
                           {m.code === "core"
                             ? "Núcleo operativo base de PROCESA Cloud."
                             : !isEntitled
-                            ? `Requiere plan superior para acceder. Plan actual: ${sub?.plan?.name ?? "Free"}.`
+                            ? `Requiere plan superior para acceder. Plan actual: ${entitlements.plan?.name ?? "Free"}.`
                             : !isReady
                             ? "En fase de desarrollo activo para PROCESA Cloud."
                             : "Módulo empresarial integrado listo para activar."}
