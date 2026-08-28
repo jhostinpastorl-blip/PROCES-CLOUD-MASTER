@@ -19,6 +19,7 @@ interface ItemRow {
   quantity: number;
   unitCost: number;
   taxType: string;
+  currentCost: number;
 }
 
 export function PurchaseFormClient({ companyId, suppliers, warehouses, products }: Props) {
@@ -41,7 +42,6 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
     const prod = products.find(p => p.id === selectedProductId);
     if (!prod) return;
 
-    // Si ya existe en la lista, incrementar cantidad
     const existingIndex = items.findIndex(i => i.productId === prod.id);
     if (existingIndex >= 0) {
       const updated = [...items];
@@ -57,6 +57,7 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
           quantity: 1,
           unitCost: Number(prod.cost) || 0,
           taxType: prod.tax_type,
+          currentCost: Number(prod.cost) || 0,
         },
       ]);
     }
@@ -73,7 +74,7 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
     setItems(items.filter((_, i) => i !== index));
   };
 
-  // Cálculo de subtotales
+  // Subtotals
   let subtotal = 0;
   let taxTotal = 0;
   for (const item of items) {
@@ -132,7 +133,7 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
         <div>
           <h2 className="text-xl font-bold text-foreground">Registrar Nueva Compra</h2>
           <p className="text-sm text-muted-foreground">
-            Ingreso de mercadería, recálculo de costo promedio ponderado y trazabilidad Kardex.
+            Ingreso de mercadería, recálculo atómico de costo promedio ponderado (CPP) y Kardex valorizado.
           </p>
         </div>
         <div className="flex gap-2">
@@ -211,7 +212,7 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
               value={docNumber}
               onChange={(e) => setDocNumber(e.target.value)}
               placeholder="F001-00123"
-              className="w-full px-2.5 py-2 rounded-lg border border-border bg-background text-sm"
+              className="w-full px-2.5 py-2 rounded-lg border border-border bg-background text-sm font-mono"
             />
           </div>
         </div>
@@ -229,7 +230,7 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
             <option value="">Buscar o seleccionar producto...</option>
             {products.map(p => (
               <option key={p.id} value={p.id}>
-                {p.name} [{p.sku || p.code}] - Costo Actual: S/ {Number(p.cost).toFixed(2)}
+                {p.name} [{p.sku || p.code}] - Costo Actual: S/ {Number(p.cost).toFixed(4)}
               </option>
             ))}
           </select>
@@ -252,7 +253,8 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
               <th className="px-4 py-3">Producto</th>
               <th className="px-4 py-3">SKU</th>
               <th className="px-4 py-3 w-28 text-center">Cantidad</th>
-              <th className="px-4 py-3 w-32 text-right">Costo Unit. (S/)</th>
+              <th className="px-4 py-3 w-32 text-right">Costo Compra (S/)</th>
+              <th className="px-4 py-3 text-right">Costo Actual (S/)</th>
               <th className="px-4 py-3 text-right">Subtotal</th>
               <th className="px-4 py-3 text-right">Total (+IGV)</th>
               <th className="px-4 py-3 w-16 text-center">Acción</th>
@@ -281,12 +283,15 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
                   <td className="px-4 py-3">
                     <input
                       type="number"
-                      step="0.01"
+                      step="0.0001"
                       min="0"
                       value={item.unitCost}
                       onChange={(e) => handleUpdateItem(idx, "unitCost", Math.max(0, Number(e.target.value)))}
                       className="w-full text-right px-2 py-1 rounded border border-border bg-background text-sm font-bold"
                     />
+                  </td>
+                  <td className="px-4 py-3 text-right text-xs text-muted-foreground font-mono">
+                    S/ {Number(item.currentCost).toFixed(4)}
                   </td>
                   <td className="px-4 py-3 text-right text-muted-foreground">
                     S/ {lineSubtotal.toFixed(2)}
@@ -308,7 +313,7 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
             })}
             {items.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground text-sm">
+                <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground text-sm">
                   Agregue productos utilizando el selector superior para confeccionar la orden de compra.
                 </td>
               </tr>
@@ -316,21 +321,21 @@ export function PurchaseFormClient({ companyId, suppliers, warehouses, products 
           </tbody>
           <tfoot className="border-t border-border bg-muted/20 font-semibold">
             <tr>
-              <td colSpan={5} className="px-4 py-2 text-right text-muted-foreground">
+              <td colSpan={6} className="px-4 py-2 text-right text-muted-foreground">
                 Base Imponible:
               </td>
               <td className="px-4 py-2 text-right font-semibold">S/ {subtotal.toFixed(2)}</td>
               <td></td>
             </tr>
             <tr>
-              <td colSpan={5} className="px-4 py-2 text-right text-muted-foreground">
+              <td colSpan={6} className="px-4 py-2 text-right text-muted-foreground">
                 I.G.V. (18%):
               </td>
               <td className="px-4 py-2 text-right font-semibold">S/ {taxTotal.toFixed(2)}</td>
               <td></td>
             </tr>
             <tr className="text-base font-bold text-foreground border-t border-border">
-              <td colSpan={5} className="px-4 py-3 text-right">
+              <td colSpan={6} className="px-4 py-3 text-right">
                 TOTAL COMPRA:
               </td>
               <td className="px-4 py-3 text-right text-primary font-black">
