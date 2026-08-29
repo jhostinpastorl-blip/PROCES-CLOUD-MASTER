@@ -96,3 +96,42 @@ Read-only discovery completed without changing QA, MAIN, production or staging:
 | K — billing foundation | `YA_HECHO_REQUIERE_VALIDACION` | Customer/webhook tables and provider boundary exist; adapters and signature verification remain mocks. |
 | L — Culqi preparation | `PENDIENTE` | Only a mock adapter exists; no real credentials, checkout or verified webhook flow is implemented. |
 | M — shared capabilities | `YA_HECHO_REQUIERE_VALIDACION` | Shared Sales, Inventory and CPE/SUNAT foundations exist; no new vertical formalization is authorized in this phase. |
+
+## Supabase NEW QA capacity check — 2026-08-28
+
+Organization: `Procesa Cloud` (`ntpwyzvjbuzbxwaosfpg`)
+
+Observed plan: `Free`
+
+Active projects: 2 (`PROCESA CLOUD`, `PROCESA CLOUD QA`)
+
+- The Supabase management cost check returned `USD 0` monthly for a project.
+  This does not create capacity: the Free plan permits only two active free
+  projects across organizations where the user is Owner or Administrator, and
+  both slots are already occupied.
+- Therefore a third active managed project cannot be provisioned under the
+  current zero-cost conditions while preserving both existing projects.
+- Pausing or deleting either current project would free a slot, but neither
+  operation is authorized and both conflict with the preservation requirements.
+- Creating another Free organization is not a workaround because the two-project
+  limit is account-wide for Owner/Administrator memberships.
+- A Supabase preview branch is not a free substitute. The management cost check
+  returned `USD 0.01344` hourly, and official documentation states branch usage
+  is billed separately and is not protected by the Spend Cap.
+- The official Supabase billing example for a Pro organization with three
+  default Micro projects is `USD 45` monthly total (`USD 25` plan + `USD 30`
+  compute - `USD 10` compute credits). Actual usage or different compute sizes
+  can increase that amount.
+- A disposable local/CI database remains free, but it does not satisfy the
+  persistent hosted NEW QA and Cloudflare staging cutover requirement.
+
+Capacity decision: **NO-GO for provisioning under current authorization**. A
+paid organization upgrade or an explicitly approved change to the two existing
+projects is required before phase D can continue. No project, branch, billing
+setting or existing environment was changed.
+
+Official references:
+
+- https://supabase.com/docs/guides/platform/billing-on-supabase
+- https://supabase.com/docs/guides/platform/billing-faq
+- https://supabase.com/docs/guides/platform/manage-your-usage/branching
