@@ -1,7 +1,8 @@
 # CORE P0 — RPC, RLS and tenant-isolation inventory
 
-Audit date: 2026-08-28  
-Target inspected: **PROCESA CLOUD QA** (`mejdlosvafeklzqqdudh`)  
+Audit date: 2026-08-29
+Historical target: **PROCESA CLOUD QA** (`mejdlosvafeklzqqdudh`, paused)
+Canonical target: **PROCESA CLOUD QA CLEAN** (`zanjfifwtuujvmajyobb`)
 Production target: protected; no write was performed.
 
 ## Gate evidence
@@ -73,12 +74,27 @@ Migration 073 applies these invariants:
 | Authenticated outsider | denied |
 | RBAC and module checks against another tenant | false / no disclosure |
 
-## Remaining gate
+## Persistent canonical gate
 
-The repository and clean 001–073 chain are database-verified. 072 and 073 remain
-deliberately unpersisted in drifted QA. The approved technical path is a
-parallel QA recreation using `QA_RECREATION_PLAN.md`; faking migration rows or
-applying only the tail would make recovery harder.
+The approved parallel recreation in `QA_RECREATION_PLAN.md` is complete. NEW QA
+applied 001–073 from zero and then migration 074; its ordered ledger contains 74
+entries and ends at `20260829020059`. No history row was inserted into OLD QA.
+
+- Migration 073 pgTAP: 26/26 PASS.
+- Migration 074 pgTAP: 5/5 PASS.
+- Repository CORE tests: 13/13 PASS; verify, typecheck and build PASS.
+- Tenant A → B and Tenant B → A persistent reads returned zero rows; both
+  membership and branch helper RPCs returned false across tenants.
+- Tenant A `ALL_BRANCHES` and Tenant B `SPECIFIC_BRANCHES` behavior passed.
+- `cpe_daily_summaries`, `electronic_document_items` and
+  `electronic_documents` have RLS enabled and four policies each.
+- `record_cpe_submission_result` remains an authenticated API with safe
+  `search_path`; `anon` cannot execute it or the CPE trigger functions.
+- Migration 074 removes browser EXECUTE from the remaining INTERNAL_ONLY
+  helpers while preserving required backend behavior.
+
+OLD QA remains paused and unmodified as the rollback reference. Production and
+MAIN were not modified.
 
 The supplied Google Drive portfolio is explicitly recorded as **pending future
 portfolio audit** and was not reviewed in this gate.

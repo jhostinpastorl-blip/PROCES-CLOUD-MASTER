@@ -2,19 +2,20 @@
 
 ## Estado
 
-**IMPLEMENTED:** código y migraciones 072/073 en `develop/procesacloudv2`.
+**IMPLEMENTED:** código y migraciones 072/073/074 en
+`develop/procesacloudv2`.
 
 **STATICALLY VERIFIED:** compatibilidad, dependencias, RLS, grants y regresión de
 aplicación revisados en repositorio.
 
-**DATABASE VERIFIED:** Core CI #18 creó PostgreSQL 17 desde cero, aplicó 001–073
-en orden y completó pgTAP 26/26. Además, 071, 072 y el estado combinado 072+073
-ejecutaron en PROCESA CLOUD QA dentro de transacciones revertidas.
+**DATABASE VERIFIED:** Core CI creó PostgreSQL 17 desde cero y aplicó 001–073
+en orden. La recreación paralela persistente en PROCESA CLOUD QA CLEAN
+(`zanjfifwtuujvmajyobb`) aplicó 001–074, completó pgTAP 26/26 para 073 y 5/5
+para 074, y pasó la matriz multi-tenant persistente.
 
-**PRODUCTION VERIFIED:** no. Producción no fue modificada. 072/073 tampoco se
-persistieron en QA porque esa base no registra el historial 001–071. El gate de
-cadena limpia autoriza planificar una reconstrucción QA paralela, no modificar
-la base con drift ni desplegar MAIN.
+**PRODUCTION VERIFIED:** no. Producción y MAIN no fueron modificados. OLD QA
+(`mejdlosvafeklzqqdudh`) fue pausado y preservado sin fabricar historial; la
+validación se ejecutó únicamente en NEW QA recreado desde cero.
 
 ## Decisiones
 
@@ -35,7 +36,8 @@ El estado persistido incluye `status`, `current_step`, `last_completed_step`, `w
 ## Email
 
 - Política local observada: `enable_confirmations=false` en `supabase/config.toml`.
-- Staging/producción: no observada ni modificada en esta etapa.
+- Staging: Site URL y redirects de callback/restablecimiento configurados para
+  el origen público de staging. Producción no fue modificada.
 - La aplicación consulta `email_confirmed_at`; no inventa un bloqueo si el proveedor entrega sesión confirmada.
 - Callback compatible con PKCE (`exchangeCodeForSession`) y token hash (`verifyOtp`). Reenvío con límite local, feedback no enumerable y estados enviado/confirmado/expirado/inválido.
 - Antes de habilitar confirmación remota deben configurarse Site URL, redirect allowlist y plantillas en Supabase.
@@ -61,14 +63,16 @@ El scope por sucursal de esta etapa es una foundation: restringe `branches` y el
 
 ## Validación
 
-Core CI #18 pasó suite estática, lockfile, cadena limpia, pgTAP 26/26,
-`npm ci`, typecheck y build. La misma suite de seguridad también ejecutó en QA
-con rollback y sin cambios persistentes.
+La cadena limpia y persistente pasó pgTAP 26/26 + 5/5, 13/13 pruebas CORE,
+`verify`, typecheck y build. Los smokes persistentes pasaron onboarding,
+activación POS, dashboard, superficies protegidas, aislamiento bidireccional y
+separación entre usuario tenant y plataforma. GitHub CI #24 pasó todos sus jobs.
 
 ## Siguiente etapa (no iniciada)
 
-CORE SaaS 2 — POS Activation permanece **NO-GO** hasta recrear QA en paralelo
-desde 001–073, validarla y efectuar el cutover bajo el plan de rollback aprobado.
+CORE SaaS 2 — POS Activation **no se inició**. Su decisión de readiness se emite
+separadamente después del despliegue, smoke público y aceptación del propietario
+de staging; este cierre no lo autoriza automáticamente.
 
 El portafolio histórico `TODOS LOS PORTAFOLIOS APLICACIONES WEBS` queda
 **PENDIENTE DE AUDITORÍA FUNCIONAL POSTERIOR** y no fue revisado en este gate.

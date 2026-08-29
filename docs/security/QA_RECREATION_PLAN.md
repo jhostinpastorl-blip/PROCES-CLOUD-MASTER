@@ -1,8 +1,9 @@
 # PROCESA CLOUD QA — controlled recreation plan
 
-Status: **GO FOR QA CORRECTION PLANNING**  
-Evidence: Core CI #18 applied migrations 001–073 from zero and passed pgTAP
-26/26, static checks, lockfile validation, typecheck and build.
+Status: **QA CORRECTION EXECUTED; GO FOR STAGING VALIDATION**
+Evidence: the parallel NEW QA project applied migrations 001–074 from zero,
+passed pgTAP 26/26 for migration 073 and 5/5 for migration 074, and passed the
+13 CORE tests, verify, typecheck and build. GitHub CI #24 passed all jobs.
 
 This plan does not authorize production changes, a MAIN deployment, deletion of
 the current QA project, or synthetic migration-history entries.
@@ -49,10 +50,45 @@ passes every gate and the owner approves cutover.
 
 ## Decision
 
-QA correction: **GO**, using parallel recreation only.  
-In-place baseline fabrication: **NO-GO**.  
-Production/Main synchronization: **NO-GO**.  
-CORE SaaS 2: **NO-GO until recreated QA passes the persistent cutover gate**.
+QA correction: **GO — completed by parallel recreation**.
+In-place baseline fabrication: **NO-GO; no migration rows were fabricated**.
+Production/Main synchronization: **NO-GO; neither was modified**.
+CORE SaaS 2: **NOT STARTED; its separate readiness decision follows staging
+owner acceptance**.
+
+## Parallel recreation closure — 2026-08-29 (America/Lima)
+
+- OLD QA `mejdlosvafeklzqqdudh` was paused, not deleted. Its last verified
+  fingerprint remains `2ae49b4c1a60ffd49d94d64ebfae3342`; it is the
+  reversible rollback reference.
+- NEW QA `zanjfifwtuujvmajyobb` (`PROCESA CLOUD QA CLEAN`) was created in
+  `us-west-1` on PostgreSQL `17.6.1.166`, Free plan, with no paid add-ons.
+- The canonical migration ledger contains exactly 74 ordered entries; its last
+  version is `20260829020059`. Migrations 001–073 were applied from zero and
+  migration 074 then restricted the remaining internal helper RPC exposure.
+- PostgreSQL validation passed: migration 073 pgTAP 26/26 and migration 074
+  pgTAP 5/5. Repository validation passed: 13/13 CORE tests, verify, typecheck
+  and production build.
+- Persistent fixtures created two isolated companies. Tenant A has
+  `ALL_BRANCHES`; Tenant B has `SPECIFIC_BRANCHES` with only its primary branch.
+  Both A → B and B → A table/RPC matrices returned zero rows or false.
+- Persistent application smoke passed Auth, onboarding, company, branches,
+  modules, users, roles, settings, POS, products, inventory, cash registers,
+  cash sessions and terminal. A normal tenant user was denied
+  `/procesa-admin`; the platform administrator loaded it successfully.
+- Security advisors reported no critical finding after 074: 49 security
+  findings (48 warnings, one informational) and 234 performance findings
+  (85 warnings, 149 informational) were inventoried for later remediation.
+- NEW QA Auth Site URL and allowlist contain only the staging origin and its
+  callback/password-reset routes. A remote signup reached the confirmation-mail
+  path; subsequent provider rate limiting was observed and not bypassed.
+- The Cloudflare staging Worker received the NEW QA service-role key only as an
+  encrypted server-side secret. It was not printed, committed or written to a
+  repository file.
+
+Rollback remains non-destructive: restore staging references to OLD QA only if
+an owner-accepted rollback is required, then resume OLD QA. Do not delete either
+project or fabricate ledger history.
 
 ## Execution checkpoint — 2026-08-28 (America/Lima)
 
@@ -83,14 +119,14 @@ Read-only discovery completed without changing QA, MAIN, production or staging:
 
 | Phase | Status | Evidence / dependency |
 |---|---|---|
-| A — repository, commits and docs | `YA_HECHO_VERIFICADO` | HEAD `c3e4d8d`; clean synchronized branch; authoritative documents reviewed. |
+| A — repository, commits and docs | `YA_HECHO_VERIFICADO` | Branch synchronized; authoritative documents and CI #24 reviewed. |
 | B — P0 Security | `YA_HECHO_VERIFICADO` | Migration 073, RPC/RLS inventory and CI pgTAP 26/26. |
 | C — clean DB 001–073 | `YA_HECHO_VERIFICADO` | Core CI #18 and #19 passed the isolated database, static and build jobs. |
-| D — QA parallel recreation | `PENDIENTE` | OLD QA inventory completed; NEW QA does not exist and provisioning is paused before cost confirmation. |
-| E — QA persistent security and smoke gate | `BLOQUEADO` | Requires NEW QA created from 001–073. |
-| F — QA cutover | `BLOQUEADO` | Requires phase E PASS and rollback readiness. |
-| G — staging deployment | `BLOQUEADO` | Current staging predates CORE SaaS 1 commits; deployment waits for canonical QA PASS. |
-| H — staging smoke and owner acceptance | `BLOQUEADO` | Requires phase G. |
+| D — QA parallel recreation | `YA_HECHO_VERIFICADO` | OLD QA paused and preserved; NEW QA `zanjfifwtuujvmajyobb` recreated from the canonical chain. |
+| E — QA persistent security and smoke gate | `YA_HECHO_VERIFICADO` | Ledger 001–074, pgTAP 26/26 + 5/5, persistent tenant matrix and application smokes PASS. |
+| F — QA cutover | `YA_HECHO_VERIFICADO` | Staging Auth and Worker references moved to NEW QA; OLD QA remains the rollback target. |
+| G — staging deployment | `EN_EJECUCION` | Final documented commit must be built and deployed with a verifiable SHA. |
+| H — staging smoke and owner acceptance | `PENDIENTE` | Public smoke follows the final deployment; owner acceptance remains external. |
 | I — tenant resolver/subdomains | `PENDIENTE` | First-entry resolver exists; hostname/subdomain tenant resolution was not found. Do not start before H. |
 | J — entitlements | `YA_HECHO_REQUIERE_VALIDACION` | `getEffectiveEntitlements` exists, but commercial features, add-ons and usage limits are not yet resolved by it. |
 | K — billing foundation | `YA_HECHO_REQUIERE_VALIDACION` | Customer/webhook tables and provider boundary exist; adapters and signature verification remain mocks. |
@@ -125,10 +161,10 @@ Active projects: 2 (`PROCESA CLOUD`, `PROCESA CLOUD QA`)
 - A disposable local/CI database remains free, but it does not satisfy the
   persistent hosted NEW QA and Cloudflare staging cutover requirement.
 
-Capacity decision: **NO-GO for provisioning under current authorization**. A
-paid organization upgrade or an explicitly approved change to the two existing
-projects is required before phase D can continue. No project, branch, billing
-setting or existing environment was changed.
+Capacity decision at this checkpoint was superseded by explicit owner
+authorization to pause OLD QA. Pausing it freed one Free-plan slot, so NEW QA
+was provisioned at the confirmed `USD 0` project cost. No plan upgrade, paid
+branch or add-on was purchased.
 
 Official references:
 
