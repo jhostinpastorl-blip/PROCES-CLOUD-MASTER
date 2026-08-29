@@ -125,8 +125,8 @@ Read-only discovery completed without changing QA, MAIN, production or staging:
 | D — QA parallel recreation | `YA_HECHO_VERIFICADO` | OLD QA paused and preserved; NEW QA `zanjfifwtuujvmajyobb` recreated from the canonical chain. |
 | E — QA persistent security and smoke gate | `YA_HECHO_VERIFICADO` | Ledger 001–074, pgTAP 26/26 + 5/5, persistent tenant matrix and application smokes PASS. |
 | F — QA cutover | `YA_HECHO_VERIFICADO` | Staging Auth and Worker references moved to NEW QA; OLD QA remains the rollback target. |
-| G — staging deployment | `EN_EJECUCION` | Final documented commit must be built and deployed with a verifiable SHA. |
-| H — staging smoke and owner acceptance | `PENDIENTE` | Public smoke follows the final deployment; owner acceptance remains external. |
+| G — staging deployment | `YA_HECHO_VERIFICADO` | Worker `e3bbb9fc-6877-4a26-8350-a0cc713d7477` serves build `e0a0ab5` against NEW QA. |
+| H — staging smoke and owner acceptance | `YA_HECHO_REQUIERE_ACEPTACION` | Public and authenticated smokes PASS; owner acceptance remains external. |
 | I — tenant resolver/subdomains | `PENDIENTE` | First-entry resolver exists; hostname/subdomain tenant resolution was not found. Do not start before H. |
 | J — entitlements | `YA_HECHO_REQUIERE_VALIDACION` | `getEffectiveEntitlements` exists, but commercial features, add-ons and usage limits are not yet resolved by it. |
 | K — billing foundation | `YA_HECHO_REQUIERE_VALIDACION` | Customer/webhook tables and provider boundary exist; adapters and signature verification remain mocks. |
@@ -171,3 +171,38 @@ Official references:
 - https://supabase.com/docs/guides/platform/billing-on-supabase
 - https://supabase.com/docs/guides/platform/billing-faq
 - https://supabase.com/docs/guides/platform/manage-your-usage/branching
+
+## Staging deployment and public smoke — 2026-08-29
+
+- URL: `https://procesa-cloud-v2-staging.jhostinpastorl.workers.dev`
+- Cloudflare Worker version: `e3bbb9fc-6877-4a26-8350-a0cc713d7477`
+- Deployment created: `2026-08-29T11:55:34.762Z`
+- Application build: `e0a0ab5ac8f2f7f7b8945fea658640f47628354c`
+- `/api/version` returned that exact build and Supabase project ref
+  `zanjfifwtuujvmajyobb`.
+- `/api/health`, `/api/status`, `/api/config-check`, `/api/ready` and
+  `/api/readiness` returned HTTP 200. Readiness uses the encrypted server-side
+  Worker secret; direct `anon` table access remains revoked.
+- The final GitHub Core CI run for the deployed build completed successfully:
+  `https://github.com/jhostinpastorl-blip/PROCES-CLOUD-MASTER/actions/runs/33251147208`.
+- The live landing and registration surfaces passed at widths 1920, 1440, 1366,
+  1280, 1024, 768, 430, 390 and 360 without horizontal overflow. Required form
+  controls remained visible; dark/light switching and mobile navigation passed.
+- Anonymous requests to `/app/dashboard`, `/app/pos` and `/procesa-admin`
+  redirected to login.
+- Tenant A authenticated successfully, selected `QA Tenant A` with
+  `ALL_BRANCHES`, and loaded dashboard, context, company, branches, users,
+  roles, modules, storage, audit, notifications, subscription, settings,
+  security, POS, products, inventory, cash registers, cash sessions and terminal.
+- The same tenant user was redirected from `/procesa-admin` to `/app/dashboard`.
+- The synthetic platform administrator loaded the SuperAdmin summary,
+  companies, plans, modules, demo requests and platform audit surfaces.
+- Both synthetic passwords were rotated only in NEW QA for the smoke; their
+  values were not printed or committed. The final browser session was logged
+  out and protected-route access again redirected to login.
+- A streamed page produced client errors only while the automated test aborted
+  it through rapid navigation. An isolated five-second reload of that page
+  loaded successfully with no browser warnings or errors.
+
+Staging decision: **GO FOR OWNER ACCEPTANCE**. Production, MAIN and CORE SaaS 2
+remain outside this decision.

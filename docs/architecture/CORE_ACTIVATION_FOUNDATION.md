@@ -74,5 +74,10 @@ CORE SaaS 2 — POS Activation **no se inició**. Su decisión de readiness se e
 separadamente después del despliegue, smoke público y aceptación del propietario
 de staging; este cierre no lo autoriza automáticamente.
 
+El despliegue público de staging del build `e0a0ab5` y sus smokes técnicos,
+responsive, autenticados, tenant y SuperAdmin pasaron el 2026-08-29. El entorno
+queda **GO FOR OWNER ACCEPTANCE**; esa evidencia todavía no equivale a aceptación
+del propietario ni autoriza iniciar CORE SaaS 2.
+
 El portafolio histórico `TODOS LOS PORTAFOLIOS APLICACIONES WEBS` queda
 **PENDIENTE DE AUDITORÍA FUNCIONAL POSTERIOR** y no fue revisado en este gate.
