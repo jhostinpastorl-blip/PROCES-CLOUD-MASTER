@@ -1,6 +1,12 @@
 -- PROCESA Cloud · P0 CORE security and tenant-isolation hardening
 -- Forward-only. Removes implicit RPC exposure and fixes unsafe definer defaults.
 
+-- These authorization tables already have tenant policies, but the historical
+-- chain never enabled RLS on a fresh database. QA masked the omission through
+-- out-of-band drift.
+alter table public.roles enable row level security;
+alter table public.role_permissions enable row level security;
+
 revoke create on schema public from public, anon, authenticated, service_role;
 
 -- Legacy Supabase projects auto-granted every table privilege to API roles.

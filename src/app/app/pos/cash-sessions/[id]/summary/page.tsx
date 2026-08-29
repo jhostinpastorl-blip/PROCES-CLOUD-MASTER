@@ -14,7 +14,7 @@ export default async function PosCashSessionSummaryPage({
   if (!ctx) return <div>No hay contexto de empresa activo.</div>;
 
   await requireModule(ctx.company.companyId, "pos");
-  await requirePermission(ctx.company.companyId, "pos.cash_sessions.read" as any);
+  await requirePermission(ctx.company.companyId, "pos.reports.cash");
 
   const { id } = await params;
   const supabase = await createClient();
