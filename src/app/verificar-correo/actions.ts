@@ -1,18 +1,63 @@
 "use server";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { emailSchema } from "@/lib/forms/schemas";
-import { localRateLimit } from "@/lib/security/rate-limit";
-import { requestFingerprint } from "@/lib/security/request";
+import { classifyResendFailure } from "@/lib/auth/email-confirmation";
 
-export async function resendVerification(formData: FormData) {
+export type ResendVerificationState = {
+  status: "idle" | "sent" | "invalid" | "rate" | "confirmed-login" | "provider";
+  message: string;
+  cooldownSeconds: number;
+};
+
+export const initialResendState: ResendVerificationState = {
+  status: "idle",
+  message: "",
+  cooldownSeconds: 0,
+};
+
+export async function resendVerification(
+  _previousState: ResendVerificationState,
+  formData: FormData,
+): Promise<ResendVerificationState> {
   const parsed = emailSchema.safeParse(formData.get("email"));
-  const fingerprint = await requestFingerprint("email-verification");
-  if (!localRateLimit(fingerprint, 3, 15 * 60_000).ok) redirect("/verificar-correo?state=rate");
-  if (parsed.success) {
-    const s = await createClient();
-    const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "http://localhost:3000";
-    await s.auth.resend({ type: "signup", email: parsed.data, options: { emailRedirectTo: `${base}/auth/callback?next=${encodeURIComponent("/onboarding")}` } });
+  if (!parsed.success) {
+    return { status: "invalid", message: "Ingresa un correo válido.", cooldownSeconds: 0 };
   }
-  redirect("/verificar-correo?state=sent");
+
+  const s = await createClient();
+  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "http://localhost:3000";
+  const { error } = await s.auth.resend({
+    type: "signup",
+    email: parsed.data,
+    options: { emailRedirectTo: `${base}/auth/callback?next=${encodeURIComponent("/onboarding")}` },
+  });
+
+  if (!error) {
+    return {
+      status: "sent",
+      message: "Solicitud aceptada. Revisa tu bandeja de entrada y spam.",
+      cooldownSeconds: 60,
+    };
+  }
+
+  const status = classifyResendFailure(error);
+  if (status === "rate") {
+    return {
+      status,
+      message: "Supabase limitó temporalmente los envíos. Espera antes de intentarlo de nuevo.",
+      cooldownSeconds: 60,
+    };
+  }
+  if (status === "confirmed-login") {
+    return {
+      status,
+      message: "Este correo ya está confirmado. Inicia sesión para continuar.",
+      cooldownSeconds: 0,
+    };
+  }
+  return {
+    status,
+    message: "El proveedor no pudo enviar el correo. Inténtalo nuevamente en unos minutos.",
+    cooldownSeconds: 0,
+  };
 }

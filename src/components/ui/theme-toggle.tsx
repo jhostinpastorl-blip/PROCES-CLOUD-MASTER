@@ -60,20 +60,21 @@ export function ThemeToggle({ className = "", showLabel = true }: { className?: 
 
   return (
     <div className={`theme-switch-container ${className}`}>
-      {showLabel && <span className="theme-switch-caption">Luz</span>}
+      {showLabel && <span className="theme-switch-caption">Apariencia</span>}
       <button
         type="button"
         role="switch"
         aria-checked={isLight}
-        aria-label={isLight ? "Desactivar luz (activar modo oscuro)" : "Activar luz (activar modo claro)"}
+        aria-label={isLight ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
         className={`luxury-theme-switch ${isLight ? "state-on" : "state-off"}`}
         onClick={toggle}
-        title={isLight ? "Luz ON activa — Cambiar a modo oscuro" : "Luz OFF activa — Cambiar a modo claro"}
+        title={isLight ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
       >
         <span className="switch-track">
+          <span className="switch-icon switch-icon-sun" aria-hidden="true">☀</span>
+          <span className="switch-icon switch-icon-moon" aria-hidden="true">◐</span>
           <span className="switch-knob" />
         </span>
-        <span className="switch-state-text">{isLight ? "ON" : "OFF"}</span>
       </button>
     </div>
   );

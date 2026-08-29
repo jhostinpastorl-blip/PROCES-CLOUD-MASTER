@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import { HERO_PRODUCT_EXPERIENCES, ProductExperience } from "@/config/product-experiences";
 
@@ -28,22 +28,14 @@ export function ProductHeroCarousel() {
     setCurrentIndex((prev) => (prev === HERO_PRODUCT_EXPERIENCES.length - 1 ? 0 : prev + 1));
   }, []);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        handlePrev();
-      } else if (e.key === "ArrowRight") {
-        handleNext();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleNext, handlePrev]);
-
   return (
     <div
       className="hero-carousel-wrapper"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowLeft") handlePrev();
+        if (event.key === "ArrowRight") handleNext();
+      }}
       style={
         {
           "--product-accent": currentProduct.accentColor,
@@ -51,7 +43,8 @@ export function ProductHeroCarousel() {
           "--product-badge": currentProduct.accentBadge,
         } as React.CSSProperties
       }
-      aria-roledescription="carrusel de productos"
+      role="region"
+      aria-roledescription="carrusel"
       aria-label="Ecosistema de Soluciones PROCESA Cloud"
     >
       {/* NAVEGACIÓN SUPERIOR DE PRODUCTOS (PILLS DEL ECOSISTEMA) */}
@@ -273,13 +266,12 @@ export function ProductHeroCarousel() {
           <span className="arrow-text">Anterior</span>
         </button>
 
-        <div className="carousel-indicators" role="tablist" aria-label="Indicadores de solución">
+        <div className="carousel-indicators" role="group" aria-label="Indicadores de solución">
           {HERO_PRODUCT_EXPERIENCES.map((p, idx) => (
             <button
               key={p.id}
               type="button"
-              role="tab"
-              aria-selected={idx === currentIndex}
+              aria-pressed={idx === currentIndex}
               className={`indicator-dot ${idx === currentIndex ? "active" : ""}`}
               onClick={() => setCurrentIndex(idx)}
               aria-label={`Ir a solución ${idx + 1}: ${p.name}`}

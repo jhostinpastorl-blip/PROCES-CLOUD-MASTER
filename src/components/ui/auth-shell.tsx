@@ -29,18 +29,18 @@ export function AuthShell({ children, kicker, title, subtitle }: AuthShellProps)
             </p>
           </div>
         </div>
-        <div className="auth-proof">
+        <div className="auth-proof" aria-label="Fundamentos de la plataforma">
           <div>
-            <b>10+</b>
-            <span>Módulos conectados</span>
+            <b>Multiempresa</b>
+            <span>Contextos separados</span>
           </div>
           <div>
-            <b>24/7</b>
-            <span>Acceso a tu operación</span>
+            <b>Multisucursal</b>
+            <span>Operación conectada</span>
           </div>
           <div>
-            <b>1</b>
-            <span>Plataforma empresarial</span>
+            <b>Acceso por rol</b>
+            <span>Control desde el Core</span>
           </div>
         </div>
       </section>
