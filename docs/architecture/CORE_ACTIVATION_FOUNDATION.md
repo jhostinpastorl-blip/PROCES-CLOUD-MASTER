@@ -7,13 +7,14 @@
 **STATICALLY VERIFIED:** compatibilidad, dependencias, RLS, grants y regresión de
 aplicación revisados en repositorio.
 
-**DATABASE VERIFIED:** 071, 072 y el estado combinado 072+073 ejecutaron en
-PostgreSQL 17 de PROCESA CLOUD QA dentro de transacciones revertidas. La suite
-pgTAP llegó a 26/26 casos de aislamiento y autorización.
+**DATABASE VERIFIED:** Core CI #18 creó PostgreSQL 17 desde cero, aplicó 001–073
+en orden y completó pgTAP 26/26. Además, 071, 072 y el estado combinado 072+073
+ejecutaron en PROCESA CLOUD QA dentro de transacciones revertidas.
 
 **PRODUCTION VERIFIED:** no. Producción no fue modificada. 072/073 tampoco se
-persistieron en QA porque esa base no registra el historial 001–071 aunque sí
-contiene el esquema funcional avanzado. Resolver ese baseline es un gate previo.
+persistieron en QA porque esa base no registra el historial 001–071. El gate de
+cadena limpia autoriza planificar una reconstrucción QA paralela, no modificar
+la base con drift ni desplegar MAIN.
 
 ## Decisiones
 
@@ -60,18 +61,14 @@ El scope por sucursal de esta etapa es una foundation: restringe `branches` y el
 
 ## Validación
 
-La validación anterior de aplicación registró `npm run test:core`, typecheck,
-verify y build en PASS. En este gate se añadió una suite pgTAP de 26 casos y un
-job CI que levanta Supabase aislado, aplica la cadena completa y bloquea ante un
-fallo RLS/RPC/tenant. La máquina actual no tiene Docker, por lo que el reset
-local completo queda a cargo del nuevo gate CI; la misma suite sí se ejecutó en
-QA con rollback y sin cambios persistentes.
+Core CI #18 pasó suite estática, lockfile, cadena limpia, pgTAP 26/26,
+`npm ci`, typecheck y build. La misma suite de seguridad también ejecutó en QA
+con rollback y sin cambios persistentes.
 
 ## Siguiente etapa (no iniciada)
 
-CORE SaaS 2 — POS Activation permanece **NO-GO** hasta reconstruir o baselinar
-de forma verificable QA, aplicar 071–073 en orden y volver a ejecutar el gate
-contra el estado persistido.
+CORE SaaS 2 — POS Activation permanece **NO-GO** hasta recrear QA en paralelo
+desde 001–073, validarla y efectuar el cutover bajo el plan de rollback aprobado.
 
 El portafolio histórico `TODOS LOS PORTAFOLIOS APLICACIONES WEBS` queda
 **PENDIENTE DE AUDITORÍA FUNCIONAL POSTERIOR** y no fue revisado en este gate.

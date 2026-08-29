@@ -12,3 +12,4 @@
 - architecture/CORE_ACTIVATION_FOUNDATION.md — CORE SaaS 1 verification levels and gate
 - security/CORE_P0_RPC_RLS_INVENTORY.md — complete RPC/RLS classification and P0 evidence
 - security/QA_VS_MAIN_P0_DRIFT.md — read-only environment drift report
+- security/QA_RECREATION_PLAN.md — controlled QA rebuild and rollback gate

@@ -21,6 +21,9 @@ Production target: protected; no write was performed.
 - Migrations 071 and 072 each executed successfully in a real QA PostgreSQL
   transaction and were rolled back. The combined 072 + 073 security state and
   26 tenant-isolation assertions also executed successfully and were rolled back.
+- Core CI #18 subsequently applied the complete 001–073 chain to an isolated
+  PostgreSQL 17 database. It exposed and verified the fix for missing RLS on
+  `roles` and `role_permissions`; pgTAP finished 26/26 PASS.
 
 ## Function classification after 072
 
@@ -48,7 +51,8 @@ Migration 073 applies these invariants:
 1. `anon` has no direct public-schema table, sequence or function privileges.
 2. `authenticated` table privileges are regenerated only for operations that
    have a matching `authenticated` or legacy `public` RLS policy.
-3. All public tables remain RLS-enabled.
+3. All public tables are RLS-enabled, including `roles` and
+   `role_permissions`, which the historical clean chain had omitted.
 4. Trigger functions are not callable as RPCs.
 5. Legacy definers with missing or `public`-only paths use
    `pg_catalog, public`; 072 functions retain the stricter empty path.
@@ -71,11 +75,10 @@ Migration 073 applies these invariants:
 
 ## Remaining gate
 
-072 and 073 are repository-ready and transaction-verified, but are deliberately
-not persisted to QA while the historical 001–070 migration baseline is absent.
-A maintainer must first establish an evidence-backed baseline or rebuild QA from
-the repository chain. Faking migration rows or applying only the tail would make
-the drift harder to recover.
+The repository and clean 001–073 chain are database-verified. 072 and 073 remain
+deliberately unpersisted in drifted QA. The approved technical path is a
+parallel QA recreation using `QA_RECREATION_PLAN.md`; faking migration rows or
+applying only the tail would make recovery harder.
 
 The supplied Google Drive portfolio is explicitly recorded as **pending future
 portfolio audit** and was not reviewed in this gate.
