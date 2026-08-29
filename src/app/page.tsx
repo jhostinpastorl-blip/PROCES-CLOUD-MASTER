@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { ProcesaLogo } from "@/components/ui/procesa-logo";
-import { ProductHeroCarousel } from "@/components/landing/ProductHeroCarousel";
+import { FocusedProductHero } from "@/components/landing/FocusedProductHero";
 import { LandingMotion } from "@/components/landing/LandingMotion";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { ECOSYSTEM_SOLUTIONS_CATALOG } from "@/config/product-experiences";
@@ -39,10 +39,10 @@ export default function Home() {
       <LandingMotion />
       <LandingNav />
 
-      {/* HERO V2: CARRUSEL MULTIPRODUCTO ESTRATÉGICO */}
+      {/* Hero enfocado: una propuesta y una historia de producto. */}
       <section className="hero-final" data-reveal="hero">
         <div className="hero-v2-container">
-          <ProductHeroCarousel />
+          <FocusedProductHero />
         </div>
       </section>
 
