@@ -1,0 +1,2 @@
+import { LoginView } from "@/components/public/PublicAuth";import { sanitizeNextPath } from "@/lib/activation/first-entry-policy";
+export default async function IniciarSesion({searchParams}:{searchParams:Promise<{next?:string;error?:string;check_email?:string;confirmed?:string;password_updated?:string}>}){const q=await searchParams;return <LoginView route="/iniciar-sesion" query={{...q,next:sanitizeNextPath(q.next)??undefined}}/>}

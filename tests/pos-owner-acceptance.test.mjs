@@ -4,17 +4,15 @@ import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("landing uses one focused product story without carousel controls", async () => {
-  const [page, hero] = await Promise.all([
-    read("src/app/page.tsx"),
-    read("src/components/landing/FocusedProductHero.tsx"),
-  ]);
-  assert.match(page, /FocusedProductHero/);
+test("public landing uses the approved real-time operations story without carousel controls", async () => {
+  const page = await read("src/app/page.tsx");
+  assert.match(page, /Procesándose en tiempo real/);
+  assert.match(page, /DashboardPreview/);
   assert.doesNotMatch(page, /ProductHeroCarousel/);
-  assert.match(hero, /Ventas del día/);
-  assert.match(hero, /Caja actual/);
-  assert.match(hero, /Stock crítico/);
-  assert.doesNotMatch(hero, /Anterior|Siguiente|carousel/);
+  assert.match(page, /Ventas acumuladas hoy/);
+  assert.match(page, /Caja en turno/);
+  assert.match(page, /Stock crítico/);
+  assert.doesNotMatch(page, /Anterior|Siguiente|carousel/);
 });
 
 test("POS utility styles are compiled and first-run route covers first sale", async () => {

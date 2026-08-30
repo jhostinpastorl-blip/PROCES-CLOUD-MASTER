@@ -1,5 +1,6 @@
 import{ThemeInit}from"@/components/ui/theme-init";
 import "./globals.css";
+import "./public-site.css";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "PROCESA Cloud | El futuro se procesa hoy.",
