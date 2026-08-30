@@ -5,6 +5,19 @@ on:
     branches: [main]
 
 jobs:
+  database-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start isolated Supabase and apply the complete migration chain
+        run: supabase start
+      - name: Run pgTAP security and tenant-isolation tests
+        run: supabase test db
+
   static:
     runs-on: ubuntu-latest
     steps:
@@ -19,7 +32,7 @@ jobs:
       - run: node scripts/check_lockfile.mjs
 
   build:
-    needs: static
+    needs: [static, database-security]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

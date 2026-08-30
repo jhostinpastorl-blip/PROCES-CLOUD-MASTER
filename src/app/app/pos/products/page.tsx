@@ -6,7 +6,8 @@ import { StatusChip } from "@/components/ui/status-chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { createProduct, toggleProductStatus } from "./actions";
 
-export default async function ProductsPage() {
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ created?: string }> }) {
+  const { created } = await searchParams;
   const ctx = await getResolvedContext();
   if (!ctx) {
     return (
@@ -46,6 +47,13 @@ export default async function ProductsPage() {
       </div>
 
       <PosSubNav activePath="/app/pos/products" />
+
+      {created && (
+        <div className="pos-success-banner" role="status">
+          <span aria-hidden="true">✓</span>
+          <div><b>Producto creado correctamente</b><small>Ya está disponible en el catálogo y en la Terminal POS.</small></div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Formulario de Creación */}

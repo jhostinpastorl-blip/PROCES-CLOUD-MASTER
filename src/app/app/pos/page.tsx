@@ -25,6 +25,8 @@ export default async function PosDashboardPage() {
     { count: warehousesCount },
     { count: salesCount },
     { count: activeSessionsCount },
+    { count: stockCount },
+    { count: cashRegistersCount },
     { data: recentSales },
     { data: recentProducts },
   ] = await Promise.all([
@@ -33,6 +35,8 @@ export default async function PosDashboardPage() {
     s.from("warehouses").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).is("deleted_at", null),
     s.from("sales").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId),
     s.from("cash_sessions").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).eq("status", "open"),
+    s.from("inventory_balances").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).gt("quantity", 0),
+    s.from("cash_registers").select("id", { count: "exact", head: true }).eq("company_id", ctx.company.companyId).eq("is_active", true).is("deleted_at", null),
     s.from("sales").select("id, document_number, total, created_at, status, customers(name)").eq("company_id", ctx.company.companyId).order("created_at", { ascending: false }).limit(4),
     s.from("products").select("id, code, name, price, type, is_active").eq("company_id", ctx.company.companyId).is("deleted_at", null).order("created_at", { ascending: false }).limit(4),
   ]);
@@ -56,6 +60,29 @@ export default async function PosDashboardPage() {
       </div>
 
       <PosSubNav />
+
+      <section className="pos-first-run" aria-labelledby="pos-first-run-title">
+        <div className="pos-first-run-head">
+          <div><span>RUTA DE PRIMERA VENTA</span><h3 id="pos-first-run-title">Prepara tu POS paso a paso</h3></div>
+          <small>{[true, true, !!warehousesCount, !!productsCount, !!stockCount, !!cashRegistersCount, !!activeSessionsCount, !!salesCount].filter(Boolean).length} de 8 listos</small>
+        </div>
+        <div className="pos-first-run-steps">
+          {[
+            ["Empresa", true, "/app/company"],
+            ["POS activado", true, "/app/pos"],
+            ["Almacén", !!warehousesCount, "/app/pos/warehouses"],
+            ["Producto", !!productsCount, "/app/pos/products"],
+            ["Stock", !!stockCount, "/app/pos/inventory"],
+            ["Caja", !!cashRegistersCount, "/app/pos/cash-registers"],
+            ["Turno", !!activeSessionsCount, "/app/pos/terminal"],
+            ["Primera venta", !!salesCount, "/app/pos/terminal"],
+          ].map(([label, complete, href], index) => (
+            <Link key={String(label)} href={String(href)} className={complete ? "is-complete" : ""}>
+              <i>{complete ? "✓" : index + 1}</i><span>{String(label)}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* KPI Cards */}
       <section className="stats-grid real-stats mb-6">

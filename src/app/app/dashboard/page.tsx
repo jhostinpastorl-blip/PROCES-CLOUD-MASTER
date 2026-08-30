@@ -14,11 +14,12 @@ export default async function Dashboard() {
     moduleCount = 0,
     noticeCount = 0,
     recentActivity: any[] = [],
-    subData: any = null;
+    subData: any = null,
+    activation: any = null;
 
   if (active) {
     const s = await createClient();
-    const [b, u, m, n, logs, sub] = await Promise.all([
+    const [b, u, m, n, logs, sub, activationResult] = await Promise.all([
       s
         .from("branches")
         .select("id", { count: "exact", head: true })
@@ -46,6 +47,7 @@ export default async function Dashboard() {
         .order("created_at", { ascending: false })
         .limit(6),
       getCompanySubscription(active.company.companyId),
+      s.from("company_solution_activations").select("status,entitlement_snapshot,solution_catalog(name,code),solution_packages(name,code)").eq("company_id", active.company.companyId).order("activated_at", { ascending: false }).limit(1).maybeSingle(),
     ]);
 
     branchCount = b.count ?? 0;
@@ -54,6 +56,7 @@ export default async function Dashboard() {
     noticeCount = n.count ?? 0;
     recentActivity = logs.data ?? [];
     subData = sub;
+    activation = activationResult.data;
   }
 
   return (
@@ -91,25 +94,50 @@ export default async function Dashboard() {
 
           <section className="stats-grid real-stats">
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">⌘</i>
               <span>Sucursales activas</span>
               <strong>{branchCount}</strong>
               <small>{subData?.plan?.max_branches ? `Límite: ${subData.plan.max_branches}` : "Sin límite"}</small>
             </article>
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">◎</i>
               <span>Usuarios activos</span>
               <strong>{userCount}</strong>
               <small>{subData?.plan?.max_users ? `Límite: ${subData.plan.max_users}` : "Sin límite"}</small>
             </article>
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">▦</i>
               <span>Módulos activos</span>
               <strong>{moduleCount}</strong>
               <small>Capacidades habilitadas</small>
             </article>
             <article className="stat-card">
+              <i className="stat-card-icon" aria-hidden="true">◌</i>
               <span>Notificaciones</span>
               <strong>{noticeCount}</strong>
               <small>Pendientes de lectura</small>
             </article>
+          </section>
+
+          {activation?.status === "CONFIGURING" && (
+            <section className="dashboard-next-action">
+              <div>
+                <span>SIGUIENTE ACCIÓN</span>
+                <h3>Termina de configurar {activation.solution_catalog?.name ?? "tu solución"}</h3>
+                <p>Crea productos, almacenes y cajas antes de iniciar la primera venta. La activación comercial existe; la preparación operativa sigue pendiente.</p>
+              </div>
+              <Link className="primary-btn" href="/app/pos">Configurar POS →</Link>
+            </section>
+          )}
+
+          <section className="dashboard-command-band" aria-label="Asistente Viernes">
+            <div className="viernes-command-mark" aria-hidden="true">✦</div>
+            <div>
+              <span>VIERNES · ASISTENCIA EMPRESARIAL</span>
+              <h3>Convierte el contexto de tu operación en respuestas útiles.</h3>
+              <p>Consulta información según la empresa activa, la sucursal y tus permisos disponibles.</p>
+            </div>
+            <Link className="pc-btn pc-btn-secondary pc-btn-md" href="/app/viernes">Abrir Viernes →</Link>
           </section>
 
           <section className="real-dashboard-grid">

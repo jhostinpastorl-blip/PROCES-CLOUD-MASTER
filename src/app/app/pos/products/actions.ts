@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requirePermission } from "@/lib/auth/permissions";
 import { requireModule } from "@/lib/modules/entitlements";
+import { redirect } from "next/navigation";
 import { audit } from "@/lib/audit/log";
 
 const productSchema = z.object({
@@ -49,26 +50,21 @@ export async function createProduct(f: FormData) {
   await requirePermission(p.companyId, "pos.products.manage");
 
   const s = await createClient();
-  const { data, error } = await s
-    .from("products")
-    .insert({
-      company_id: p.companyId,
-      category_id: p.categoryId,
-      code: p.code,
-      sku: p.sku,
-      barcode: p.barcode,
-      name: p.name,
-      description: p.description || null,
-      type: p.type,
-      unit: p.unit,
-      price: p.price,
-      cost: p.cost,
-      tax_type: p.taxType,
-      allows_inventory: p.allowsInventory,
-      is_active: true,
-    })
-    .select("id")
-    .single();
+  const { data, error } = await s.rpc("create_pos_product", {
+    p_company_id: p.companyId,
+    p_category_id: p.categoryId,
+    p_code: p.code,
+    p_sku: p.sku,
+    p_barcode: p.barcode,
+    p_name: p.name,
+    p_description: p.description,
+    p_type: p.type,
+    p_unit: p.unit,
+    p_price: p.price,
+    p_cost: p.cost,
+    p_tax_type: p.taxType,
+    p_allows_inventory: p.allowsInventory,
+  });
 
   if (error) {
     if (error.message.includes("products_company_id_code_key")) {
@@ -83,15 +79,9 @@ export async function createProduct(f: FormData) {
     throw error;
   }
 
-  await audit(p.companyId, "product.created", "product", data.id, {
-    code: p.code,
-    name: p.name,
-    type: p.type,
-    price: p.price,
-  });
-
   revalidatePath("/app/pos/products");
   revalidatePath("/app/pos");
+  redirect(`/app/pos/products?created=${data}`);
 }
 
 export async function updateProduct(f: FormData) {

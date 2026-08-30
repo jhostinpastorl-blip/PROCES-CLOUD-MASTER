@@ -1,1 +1,22 @@
-import{createClient}from"@/lib/supabase/server";export async function GET(){try{const s=await createClient();const{error}=await s.from("modules").select("id",{head:true,count:"exact"});if(error)throw error;return Response.json({status:"ready",database:"ok"},{headers:{"Cache-Control":"no-store"}})}catch{return Response.json({status:"not_ready",database:"error"},{status:503,headers:{"Cache-Control":"no-store"}})}}
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export async function GET() {
+  try {
+    const supabase = createAdminClient();
+    const { error } = await supabase
+      .from("modules")
+      .select("id", { head: true, count: "exact" });
+
+    if (error) throw error;
+
+    return Response.json(
+      { status: "ready", database: "ok" },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+  } catch {
+    return Response.json(
+      { status: "not_ready", database: "error" },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+}

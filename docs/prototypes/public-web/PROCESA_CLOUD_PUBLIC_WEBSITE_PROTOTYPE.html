@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROCESA Cloud — Plataforma SaaS modular</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a1220;
+    --bg-2: #0d1a2e;
+    --panel: #111d33;
+    --panel-2: #16243c;
+    --panel-3: #182842;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text-primary: #f5f7fa;
+    --text-secondary: #9aa6bc;
+    --text-tertiary: #5c6a83;
+    --yellow: #f7c948;
+    --yellow-deep: #e6b52e;
+    --yellow-soft: rgba(247,201,72,0.12);
+    --yellow-border: rgba(247,201,72,0.35);
+    --green: #34d399;
+    --green-soft: rgba(52,211,153,0.12);
+    --red: #ff6b6b;
+    --red-soft: rgba(255,107,107,0.12);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 28px;
+    --radius-full: 999px;
+    --shadow-lg: 0 50px 110px -30px rgba(0,0,0,0.75), 0 12px 30px -14px rgba(0,0,0,0.5);
+    --shadow-md: 0 16px 38px -14px rgba(0,0,0,0.55);
+    --ease-spring: cubic-bezier(.34,1.56,.64,1);
+    --ease-out: cubic-bezier(.16,1,.3,1);
+  }
+
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 55%, var(--bg) 100%);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ---------- Ambient mesh + grain (premium depth) ---------- */
+  .mesh{ position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .blob{ position: absolute; border-radius: 50%; filter: blur(110px); }
+  .blob-a{
+    width: 560px; height: 560px; top: -140px; right: -100px;
+    background: radial-gradient(circle, rgba(247,201,72,0.32), transparent 70%);
+    animation: blobMoveA 17s ease-in-out infinite alternate;
+  }
+  .blob-b{
+    width: 620px; height: 620px; bottom: -220px; left: -160px;
+    background: radial-gradient(circle, rgba(60,90,160,0.35), transparent 70%);
+    animation: blobMoveB 21s ease-in-out infinite alternate;
+  }
+  @keyframes blobMoveA{ 0%{ transform: translate(0,0); } 100%{ transform: translate(-50px,40px); } }
+  @keyframes blobMoveB{ 0%{ transform: translate(0,0); } 100%{ transform: translate(40px,-40px); } }
+
+  .network{ position: fixed; top: 0; right: 0; width: 62vw; max-width: 900px; height: 100vh; z-index: 0; pointer-events: none; opacity: 0.5; }
+  .network svg{ width: 100%; height: 100%; }
+
+  .grain{
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    opacity: 0.035; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  .wrap{ position: relative; z-index: 2; max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+
+  /* ---------- Floating glass navbar (iOS style) ---------- */
+  .nav-shell{ position: sticky; top: 18px; z-index: 50; padding: 0 24px; max-width: 1440px; margin: 0 auto; }
+  header.nav{
+    position: relative;
+    overflow: hidden;
+    background: rgba(19,31,54,0.6);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  header.nav::before{
+    content: '';
+    position: absolute; top: 0; left: 20px; right: 20px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  }
+  .nav-inner{ padding: 12px 14px 12px 18px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand{ display: flex; align-items: center; gap: 10px; }
+  .brand-mark{ width: 34px; height: 34px; flex-shrink: 0; transition: transform .4s var(--ease-spring); }
+  .brand:hover .brand-mark{ transform: rotate(-8deg) scale(1.06); }
+  .brand-mark svg{ width: 100%; height: 100%; }
+  .brand-text{ font-family: 'Sora', sans-serif; font-weight: 800; font-size: 16px; color: var(--text-primary); display: flex; align-items: baseline; gap: 6px; }
+  .brand-text .sub{ font-family: 'Inter', sans-serif; font-weight: 600; font-size: 10px; letter-spacing: 0.16em; color: var(--yellow); }
+
+  nav.links{ display: flex; align-items: center; gap: 30px; }
+  nav.links a{
+    position: relative;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex; align-items: center; gap: 5px;
+    padding-bottom: 5px;
+    transition: color .2s ease;
+  }
+  nav.links a::after{
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+    background: var(--yellow); border-radius: 2px;
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .3s var(--ease-spring);
+  }
+  nav.links a:hover{ color: var(--text-primary); }
+  nav.links a:hover::after, nav.links a.active::after{ transform: scaleX(1); }
+  nav.links a.active{ color: var(--text-primary); font-weight: 600; }
+  nav.links a svg{ width: 10px; height: 10px; opacity: 0.7; }
+
+  .nav-right{ display: flex; align-items: center; gap: 16px; }
+  .mode-toggle{ display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-tertiary); }
+  .mode-toggle .on-label{ color: var(--text-secondary); }
+  .toggle-track{ width: 38px; height: 21px; border-radius: var(--radius-full); background: var(--panel-3); border: 1px solid var(--border-strong); position: relative; cursor: pointer; }
+  .toggle-track::after{ content: ''; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 3px rgba(247,201,72,0.15); transition: left .25s var(--ease-spring); }
+  .org-select{ display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 7px 4px; }
+  .org-select svg{ width: 11px; height: 11px; opacity: .6; }
+  .link-plain{ color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; padding: 8px 4px; transition: color .2s ease; }
+  .link-plain:hover{ color: var(--text-primary); }
+
+  .btn{
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    font-weight: 700; font-size: 14px; border-radius: var(--radius-full);
+    padding: 11px 20px; cursor: pointer; border: 1px solid transparent; text-decoration: none;
+    transition: transform .25s var(--ease-spring), box-shadow .25s ease, background .2s ease, border-color .2s ease;
+    white-space: nowrap;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn-yellow{ background: var(--yellow); color: #12100a; box-shadow: 0 10px 24px -10px rgba(247,201,72,0.55); }
+  .btn-yellow:hover{ background: var(--yellow-deep); transform: translateY(-2px) scale(1.015); box-shadow: 0 18px 34px -12px rgba(247,201,72,0.65); }
+  .btn-outline{ background: rgba(255,255,255,0.02); border: 1px solid var(--border-strong); color: var(--text-primary); }
+  .btn-outline:hover{ border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+  .btn-sm{ padding: 9px 16px; font-size: 13px; }
+  .btn-lg{ padding: 14px 24px; font-size: 15px; }
+  .btn svg{ width: 12px; height: 12px; }
+
+  /* ---------- Segmented module control (iOS sliding indicator) ---------- */
+  .modules-row{
+    position: relative;
+    display: inline-flex;
+    gap: 2px;
+    padding: 5px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    margin: 34px 0 0;
+    backdrop-filter: blur(12px);
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .seg-indicator{
+    position: absolute; top: 5px; left: 5px; height: calc(100% - 10px);
+    background: var(--yellow);
+    border-radius: var(--radius-full);
+    box-shadow: 0 6px 16px -6px rgba(247,201,72,0.5);
+    transition: transform .4s var(--ease-spring), width .4s var(--ease-spring);
+    z-index: 0;
+  }
+  .mtab{
+    position: relative; z-index: 1;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px 10px 13px;
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+    transition: color .3s ease;
+  }
+  .mtab .dot{ width: 6px; height: 6px; border-radius: 50%; background: var(--text-tertiary); transition: background .3s ease; }
+  .mtab:hover:not(.active){ color: var(--text-primary); }
+  .mtab.active{ color: #12100a; }
+  .mtab.active .dot{ background: #12100a; }
+  .mtab .tag{ font-size: 9px; font-weight: 700; letter-spacing: 0.04em; background: rgba(0,0,0,0.14); color: inherit; padding: 2px 6px; border-radius: 5px; }
+
+  /* ---------- Hero ---------- */
+  .hero{ display: grid; grid-template-columns: minmax(0,480px) minmax(0,1fr); gap: 56px; align-items: center; padding: 44px 0 56px; }
+
+  .eyebrow-pill{
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: var(--radius-full);
+    background: var(--panel-2); border: 1px solid var(--border);
+    font-size: 12.5px; font-weight: 500; color: var(--text-secondary);
+    margin-bottom: 26px;
+  }
+  .eyebrow-pill .dot{ width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); flex-shrink: 0; box-shadow: 0 0 0 3px rgba(247,201,72,0.18); }
+
+  h1.headline{ font-family: 'Sora', sans-serif; font-weight: 800; font-size: 52px; line-height: 1.08; letter-spacing: -0.015em; color: var(--text-primary); margin-bottom: 22px; }
+  h1.headline .accent{
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(100deg, var(--yellow) 30%, #fff3d0 45%, var(--yellow) 60%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shine 3.2s ease-in-out .9s 1;
+  }
+  @keyframes shine{ 0%{ background-position: 160% 0; } 60%,100%{ background-position: -40% 0; } }
+
+  p.lede{ font-size: 16.5px; line-height: 1.65; color: var(--text-secondary); max-width: 440px; margin-bottom: 30px; }
+  p.lede em{ font-style: normal; color: var(--text-primary); font-weight: 600; }
+
+  .checklist{ display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 34px; }
+  .chip{ display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: var(--radius-full); border: 1px solid var(--border); background: rgba(255,255,255,0.015); font-size: 13px; font-weight: 500; color: var(--text-secondary); transition: border-color .2s ease, transform .2s ease; }
+  .chip:hover{ border-color: var(--border-strong); transform: translateY(-1px); }
+  .chip svg{ width: 12px; height: 12px; color: var(--yellow); flex-shrink: 0; }
+
+  .cta-row{ display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+
+  .trust-line{ font-size: 12.5px; color: var(--text-tertiary); line-height: 1.55; max-width: 400px; margin-bottom: 26px; }
+  .trust-line b{ color: var(--text-secondary); font-weight: 600; }
+
+  .foot-features{ display: flex; flex-wrap: wrap; row-gap: 10px; column-gap: 22px; }
+  .foot-features span{ display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-tertiary); font-weight: 500; }
+  .foot-features svg{ width: 12px; height: 12px; color: var(--yellow); }
+
+  /* ---------- Dashboard mockup (glass depth + live motion) ---------- */
+  .mock-perspective{ perspective: 1600px; }
+  .mock-wrap{ position: relative; animation: floaty 6.5s ease-in-out infinite; }
+  @keyframes floaty{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-9px); } }
+
+  .mock-window{
+    position: relative;
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: transform .25s var(--ease-out);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .mock-window::before{
+    content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 1px; z-index: 3;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+  }
+  .mock-titlebar{ display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  .traffic{ display: flex; gap: 7px; }
+  .traffic i{ width: 9px; height: 9px; border-radius: 50%; background: var(--text-tertiary); opacity: 0.4; }
+  .urlbar{ flex: 1; max-width: 340px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 6px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text-tertiary); }
+  .urlbar svg{ width: 10px; height: 10px; color: var(--green); }
+  .live-tag{ display: flex; align-items: center; gap: 7px; font-size: 11px; letter-spacing: 0.04em; color: var(--yellow); font-weight: 700; white-space: nowrap; }
+  .pulse-dot{ width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); position: relative; flex-shrink: 0; }
+  .pulse-dot::after{ content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid var(--yellow); animation: pulse-ring 2.2s ease-out infinite; }
+  .pulse-dot.green{ background: var(--green); }
+  .pulse-dot.green::after{ border-color: var(--green); }
+  @keyframes pulse-ring{ 0%{ transform: scale(0.6); opacity: 0.8; } 100%{ transform: scale(2.2); opacity: 0; } }
+
+  .mock-body{ display: grid; grid-template-columns: 172px 1fr; }
+  .mock-sidebar{ border-right: 1px solid var(--border); padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(255,255,255,0.012); }
+  .avatar{ width: 34px; height: 34px; border-radius: 9px; background: var(--yellow); color: #12100a; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 13px; display: grid; place-items: center; margin-bottom: 18px; }
+  .sidenav-item{ display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 500; color: var(--text-tertiary); cursor: pointer; transition: background .2s ease, color .2s ease; }
+  .sidenav-item svg{ width: 14px; height: 14px; opacity: 0.7; }
+  .sidenav-item.active{ background: var(--yellow-soft); color: var(--yellow); }
+  .sidenav-item.active svg{ opacity: 1; }
+  .sidenav-item:hover:not(.active){ color: var(--text-secondary); background: rgba(255,255,255,0.03); }
+
+  .mock-main{ padding: 22px 24px 0; }
+  .mm-top{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .mm-company{ display: flex; align-items: center; gap: 8px; }
+  .mm-company b{ font-size: 13.5px; font-weight: 600; }
+  .mm-company span{ font-size: 12px; color: var(--text-tertiary); }
+  .status-dot{ width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .pos-pill{ font-size: 10px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-strong); color: var(--text-secondary); }
+
+  .env-label{ font-size: 10.5px; letter-spacing: 0.1em; color: var(--text-tertiary); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
+  .mm-title{ font-family: 'Sora', sans-serif; font-size: 21px; font-weight: 700; margin-bottom: 3px; }
+  .mm-sub{ font-size: 12.5px; color: var(--text-tertiary); margin-bottom: 20px; }
+
+  .module-grid{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .module-card{ display: flex; align-items: center; gap: 9px; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background: rgba(255,255,255,0.015); transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+  .module-card:hover{ border-color: var(--border-strong); background: rgba(255,255,255,0.035); transform: translateY(-2px); }
+  .m-ico{ width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-size: 9.5px; font-weight: 800; letter-spacing: 0.02em; flex-shrink: 0; }
+  .m-ico.pos{ background: var(--yellow-soft); color: var(--yellow); }
+  .m-ico.inv{ background: var(--panel-3); color: var(--text-secondary); }
+  .m-ico.fin{ background: var(--green-soft); color: var(--green); }
+  .m-ico.aud{ background: var(--red-soft); color: var(--red); }
+  .module-card .m-label{ font-size: 12.5px; font-weight: 600; color: var(--text-primary); }
+
+  .stats-grid{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .stat-card{ padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border); background: rgba(255,255,255,0.015); transition: border-color .2s ease, transform .2s ease; }
+  .stat-card:hover{ border-color: var(--border-strong); transform: translateY(-2px); }
+  .stat-label{ font-size: 11px; color: var(--text-tertiary); margin-bottom: 9px; font-weight: 500; }
+  .stat-value{ font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; letter-spacing: -0.01em; transition: color .35s ease; }
+  .stat-value.flash{ color: var(--green); }
+  .stat-delta{ display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; color: var(--green); }
+  .stat-note{ font-size: 11.5px; color: var(--text-tertiary); line-height: 1.4; }
+
+  .panels-row{ display: grid; grid-template-columns: 1.55fr 1fr; gap: 10px; }
+  .panel{ border: 1px solid var(--border); border-radius: var(--radius-md); background: rgba(255,255,255,0.015); padding: 16px 17px; }
+  .panel-head{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+  .panel-head h4{ font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+  #activityFeed{ min-height: 128px; }
+  .activity-row{ display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); transition: opacity .4s ease, transform .4s ease; }
+  .activity-row:first-child{ border-top: none; }
+  .activity-row.entering{ opacity: 0; transform: translateY(-10px); }
+  .activity-row.entering.entered{ opacity: 1; transform: translateY(0); }
+  .a-tag{ font-size: 9.5px; font-weight: 800; letter-spacing: 0.03em; padding: 4px 8px; border-radius: 6px; flex-shrink: 0; width: 54px; text-align: center; }
+  .a-tag.venta{ background: var(--yellow-soft); color: var(--yellow); }
+  .a-tag.stock{ background: var(--panel-3); color: var(--text-secondary); }
+  .a-tag.caja{ background: var(--green-soft); color: var(--green); }
+  .a-text{ font-size: 12.5px; color: var(--text-secondary); flex: 1; }
+  .a-time{ font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--text-tertiary); flex-shrink: 0; }
+
+  .ai-panel .panel-head h4{ letter-spacing: 0.04em; font-size: 11.5px; color: var(--yellow); text-transform: uppercase; }
+  .ai-panel p{ font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 12px; }
+  .ai-panel a{ font-size: 12.5px; font-weight: 700; color: var(--yellow); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+
+  .mm-footer{ display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-top: 1px solid var(--border); margin-top: 18px; }
+  .mm-footer span{ font-size: 12px; color: var(--text-tertiary); }
+  .mm-footer a{ font-size: 12.5px; font-weight: 700; color: var(--yellow); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+
+  .fab{ position: absolute; bottom: 78px; left: 22px; width: 44px; height: 44px; border-radius: 50%; background: var(--yellow); display: grid; place-items: center; box-shadow: 0 10px 24px -6px rgba(247,201,72,0.5); cursor: pointer; transition: transform .3s var(--ease-spring); }
+  .fab:hover{ transform: scale(1.1) rotate(-6deg); }
+  .fab svg{ width: 18px; height: 18px; color: #12100a; }
+
+  /* ---------- Carousel controls ---------- */
+  .carousel-controls{ display: flex; align-items: center; justify-content: space-between; padding: 6px 0 60px; }
+  .nav-btn{ display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: var(--radius-full); background: var(--panel); border: 1px solid var(--border-strong); color: var(--text-primary); font-size: 13.5px; font-weight: 600; cursor: pointer; transition: border-color .2s ease, background .2s ease, transform .2s var(--ease-spring); }
+  .nav-btn:hover{ border-color: rgba(255,255,255,0.28); background: var(--panel-2); transform: translateY(-1px); }
+  .nav-btn svg{ width: 14px; height: 14px; }
+
+  .dots{ display: flex; align-items: center; gap: 7px; }
+  .dots i{ width: 6px; height: 6px; border-radius: var(--radius-full); background: var(--border-strong); display: block; transition: width .3s var(--ease-spring), background .3s ease; }
+  .dots i.active{ width: 22px; background: var(--yellow); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1180px){ .hero{ grid-template-columns: 1fr; } .mock-window{ max-width: 640px; margin: 0 auto; } }
+  @media (max-width: 860px){
+    nav.links{ display: none; }
+    .wrap{ padding: 0 20px; }
+    .nav-shell{ padding: 0 12px; }
+    h1.headline{ font-size: 36px; }
+    .mock-body{ grid-template-columns: 1fr; }
+    .mock-sidebar{ display: none; }
+    .module-grid, .stats-grid{ grid-template-columns: repeat(2,1fr); }
+    .panels-row{ grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation: none !important; transition: none !important; } }
+
+  .reveal{ opacity: 0; transform: translateY(14px); animation: reveal .8s var(--ease-out) forwards; }
+  @keyframes reveal{ to{ opacity: 1; transform: translateY(0); } }
+
+  /* ================================================================
+     EXTENSIÓN — PROCESA CLOUD · procesacloud.com
+     Mismos tokens visuales del prototipo v3. Sin nueva identidad.
+     ================================================================ */
+
+  /* ---------- Page router (simulated navigation) ---------- */
+  .page{ display: none; }
+  .page.active{ display: block; }
+  .page-section{ padding: 88px 0; border-top: 1px solid var(--border); }
+  .page-section:first-child{ border-top: none; }
+  .page-section.tight{ padding: 64px 0; }
+  .page-hero{ padding: 52px 0 20px; }
+
+  .section-head{ max-width: 640px; margin-bottom: 44px; }
+  .section-head.center{ margin-left: auto; margin-right: auto; text-align: center; }
+  .eyebrow{ display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--yellow); margin-bottom: 14px; }
+  .eyebrow .dot{ width: 5px; height: 5px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 3px rgba(247,201,72,0.18); }
+  h2.section-title{ font-family: 'Sora', sans-serif; font-weight: 800; font-size: 34px; line-height: 1.18; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h3.card-title{ font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
+  p.section-lede{ font-size: 15.5px; line-height: 1.65; color: var(--text-secondary); }
+  .section-head.center p.section-lede{ margin: 0 auto; }
+
+  /* ---------- Breadcrumb / page eyebrow bar ---------- */
+  .crumb-bar{ display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-tertiary); margin-bottom: 18px; }
+  .crumb-bar a{ color: var(--text-tertiary); text-decoration: none; cursor: pointer; }
+  .crumb-bar a:hover{ color: var(--text-secondary); }
+  .crumb-bar svg{ width: 9px; height: 9px; }
+
+  /* ---------- Generic grids ---------- */
+  .grid-2{ display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+  .grid-3{ display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .grid-4{ display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+
+  .info-card{ border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgba(255,255,255,0.015); padding: 24px; transition: border-color .2s ease, transform .2s ease, background .2s ease; }
+  .info-card:hover{ border-color: var(--border-strong); transform: translateY(-3px); background: rgba(255,255,255,0.03); }
+  .info-card .ico{ width: 40px; height: 40px; border-radius: 11px; background: var(--yellow-soft); color: var(--yellow); display: grid; place-items: center; margin-bottom: 16px; }
+  .info-card .ico svg{ width: 18px; height: 18px; }
+  .info-card p{ font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); }
+
+  /* ---------- Module cards (Soluciones) ---------- */
+  .module-showcase{ display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .mod-card{ position: relative; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgba(255,255,255,0.015); padding: 22px; cursor: pointer; transition: border-color .2s ease, transform .2s ease, background .2s ease; }
+  .mod-card:hover, .mod-card.open{ border-color: var(--yellow-border); background: rgba(247,201,72,0.04); transform: translateY(-3px); }
+  .mod-card-top{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .mod-badge{ width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 11px; letter-spacing: 0.02em; background: var(--yellow-soft); color: var(--yellow); }
+  .mod-card p.mod-desc{ font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 12px; }
+  .mod-card .mod-toggle{ font-size: 12px; font-weight: 700; color: var(--text-tertiary); display: flex; align-items: center; gap: 6px; }
+  .mod-card .mod-toggle svg{ width: 10px; height: 10px; transition: transform .25s ease; }
+  .mod-card.open .mod-toggle svg{ transform: rotate(180deg); }
+  .mod-card.open .mod-toggle{ color: var(--yellow); }
+  .mod-detail{ max-height: 0; overflow: hidden; transition: max-height .35s var(--ease-out); }
+  .mod-card.open .mod-detail{ max-height: 240px; }
+  .mod-detail-inner{ padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); }
+  .mod-detail-inner ul{ list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .mod-detail-inner li{ font-size: 12.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 7px; }
+  .mod-detail-inner li svg{ width: 11px; height: 11px; color: var(--yellow); flex-shrink: 0; margin-top: 2px; }
+  .mod-detail-inner .mod-for{ font-size: 11.5px; color: var(--text-tertiary); margin-top: 10px; }
+
+  .ai-callout{ display: flex; align-items: center; gap: 18px; border: 1px solid var(--yellow-border); border-radius: var(--radius-lg); background: linear-gradient(120deg, rgba(247,201,72,0.08), rgba(247,201,72,0.02)); padding: 22px 26px; margin-top: 16px; }
+  .ai-callout .ai-ico{ width: 46px; height: 46px; border-radius: 13px; background: var(--yellow); color: #12100a; display: grid; place-items: center; flex-shrink: 0; }
+  .ai-callout .ai-ico svg{ width: 20px; height: 20px; }
+  .ai-callout h4{ font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .ai-callout p{ font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+
+  /* ---------- Steps (Cómo funciona) ---------- */
+  .steps-rail{ display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; position: relative; }
+  .step-card{ border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgba(255,255,255,0.015); padding: 24px 20px; }
+  .step-num{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--yellow); margin-bottom: 14px; }
+  .step-card h3{ font-family: 'Sora', sans-serif; font-size: 15.5px; font-weight: 700; margin-bottom: 8px; }
+  .step-card p{ font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+
+  /* ---------- Pricing ---------- */
+  .price-toggle-note{ font-size: 12.5px; color: var(--text-tertiary); margin-bottom: 30px; }
+  .plans-grid{ display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; align-items: stretch; }
+  .plan-card{ display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius-xl); background: rgba(255,255,255,0.015); padding: 28px 26px; }
+  .plan-card.featured{ border-color: var(--yellow-border); background: linear-gradient(160deg, rgba(247,201,72,0.06), rgba(255,255,255,0.01)); position: relative; }
+  .plan-tag{ position: absolute; top: -12px; left: 26px; background: var(--yellow); color: #12100a; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; padding: 5px 12px; border-radius: var(--radius-full); }
+  .plan-name{ font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .plan-for{ font-size: 12.5px; color: var(--text-tertiary); margin-bottom: 18px; }
+  .plan-price{ font-family: 'Sora', sans-serif; font-size: 34px; font-weight: 800; margin-bottom: 2px; }
+  .plan-price span{ font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-tertiary); }
+  .plan-price.custom{ font-size: 24px; }
+  .plan-note{ font-size: 12px; color: var(--text-tertiary); margin-bottom: 22px; }
+  .plan-features{ list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; flex: 1; }
+  .plan-features li{ font-size: 13px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px; }
+  .plan-features li svg{ width: 12px; height: 12px; color: var(--green); flex-shrink: 0; margin-top: 3px; }
+  .plan-card .btn{ width: 100%; }
+  .price-disclaimer{ margin-top: 24px; font-size: 12px; color: var(--text-tertiary); line-height: 1.6; max-width: 720px; }
+
+  /* ---------- Security ---------- */
+  .sec-grid{ display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+  .sec-card{ display: flex; gap: 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgba(255,255,255,0.015); padding: 22px; }
+  .sec-card .ico{ width: 40px; height: 40px; border-radius: 11px; background: var(--panel-3); color: var(--yellow); display: grid; place-items: center; flex-shrink: 0; }
+  .sec-card .ico svg{ width: 18px; height: 18px; }
+  .sec-card h3{ font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .sec-card p{ font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ---------- Resources ---------- */
+  .resource-grid{ display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .resource-card{ display: block; border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgba(255,255,255,0.015); padding: 22px; text-decoration: none; transition: border-color .2s ease, transform .2s ease; }
+  .resource-card:hover{ border-color: var(--border-strong); transform: translateY(-3px); }
+  .resource-card .tag-mini{ font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; color: var(--yellow); text-transform: uppercase; margin-bottom: 10px; display: block; }
+  .resource-card h3{ color: var(--text-primary); }
+  .resource-card p{ font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-top: 6px; }
+
+  .faq-list{ display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
+  .faq-item{ border: 1px solid var(--border); border-radius: var(--radius-md); background: rgba(255,255,255,0.015); overflow: hidden; }
+  .faq-q{ display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; cursor: pointer; font-size: 13.5px; font-weight: 600; }
+  .faq-q svg{ width: 11px; height: 11px; color: var(--text-tertiary); flex-shrink: 0; transition: transform .25s ease; }
+  .faq-item.open .faq-q svg{ transform: rotate(180deg); }
+  .faq-a{ max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+  .faq-item.open .faq-a{ max-height: 200px; }
+  .faq-a-inner{ padding: 0 18px 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ---------- PROCESA CORP bridge page ---------- */
+  .corp-hero{ display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .corp-mark{ width: 56px; height: 56px; border-radius: 16px; background: var(--panel-2); border: 1px solid var(--border); display: grid; place-items: center; margin-bottom: 20px; }
+  .corp-mark svg{ width: 26px; height: 26px; }
+  .corp-panel{ border: 1px solid var(--border); border-radius: var(--radius-lg); background: rgba(255,255,255,0.015); padding: 26px; }
+  .corp-panel h4{ font-family: 'Sora', sans-serif; font-size: 14.5px; font-weight: 700; margin-bottom: 12px; }
+  .corp-list{ list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .corp-list li{ font-size: 13px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px; }
+  .corp-list li svg{ width: 11px; height: 11px; color: var(--yellow); flex-shrink: 0; margin-top: 3px; }
+  .corp-external-note{ font-size: 12px; color: var(--text-tertiary); margin-top: 18px; line-height: 1.6; }
+
+  /* ---------- Forms (Demo / Crear cuenta / Iniciar sesión) ---------- */
+  .form-shell{ display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .form-shell.narrow{ grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+  .form-card{ border: 1px solid var(--border); border-radius: var(--radius-xl); background: rgba(255,255,255,0.02); padding: 30px; box-shadow: var(--shadow-md); }
+  .form-side h3{ font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .form-side p{ font-size: 13.5px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 18px; }
+  .field{ margin-bottom: 16px; }
+  .field label{ display: block; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 7px; }
+  .field .req{ color: var(--yellow); }
+  .field input, .field select, .field textarea{
+    width: 100%; background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    padding: 11px 13px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 13.5px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .field input::placeholder, .field textarea::placeholder{ color: var(--text-tertiary); }
+  .field input:focus, .field select:focus, .field textarea:focus{ outline: none; border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(247,201,72,0.15); }
+  .field textarea{ resize: vertical; min-height: 88px; }
+  .field-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .checkline{ display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: var(--text-tertiary); line-height: 1.5; margin-bottom: 20px; }
+  .checkline input{ margin-top: 2px; accent-color: var(--yellow); }
+  .checkline a{ color: var(--text-secondary); }
+  .form-submit-note{ font-size: 11.5px; color: var(--text-tertiary); margin-top: 12px; line-height: 1.55; text-align: center; }
+  .form-alt-link{ text-align: center; font-size: 13px; color: var(--text-secondary); margin-top: 18px; }
+  .form-alt-link a{ color: var(--yellow); font-weight: 600; text-decoration: none; cursor: pointer; }
+
+  .form-success{ display: none; text-align: center; padding: 30px 10px; }
+  .form-success.show{ display: block; }
+  .form-success .ico{ width: 52px; height: 52px; border-radius: 50%; background: var(--green-soft); color: var(--green); display: grid; place-items: center; margin: 0 auto 18px; }
+  .form-success .ico svg{ width: 24px; height: 24px; }
+  .form-success h4{ font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .form-success p{ font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+
+  .demo-perks{ display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+  .demo-perk{ display: flex; gap: 12px; align-items: flex-start; }
+  .demo-perk .ico{ width: 30px; height: 30px; border-radius: 9px; background: var(--yellow-soft); color: var(--yellow); display: grid; place-items: center; flex-shrink: 0; }
+  .demo-perk .ico svg{ width: 13px; height: 13px; }
+  .demo-perk b{ display: block; font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .demo-perk span{ font-size: 12.5px; color: var(--text-tertiary); }
+
+  /* ---------- CTA band ---------- */
+  .cta-band{ border: 1px solid var(--yellow-border); border-radius: var(--radius-xl); background: linear-gradient(120deg, rgba(247,201,72,0.1), rgba(247,201,72,0.02)); padding: 46px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+  .cta-band h3{ font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  .cta-band p{ font-size: 14px; color: var(--text-secondary); }
+  .cta-band-actions{ display: flex; gap: 12px; flex-shrink: 0; }
+
+  /* ---------- Footer ---------- */
+  .site-footer{ border-top: 1px solid var(--border); padding: 56px 0 34px; margin-top: 40px; }
+  .footer-top{ display: grid; grid-template-columns: 1.4fr repeat(4,1fr); gap: 30px; margin-bottom: 40px; }
+  .footer-brand .brand{ margin-bottom: 14px; }
+  .footer-brand p{ font-size: 13px; color: var(--text-tertiary); line-height: 1.6; max-width: 260px; }
+  .footer-col h5{ font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 16px; }
+  .footer-col ul{ list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  .footer-col a{ font-size: 13.5px; color: var(--text-secondary); text-decoration: none; cursor: pointer; transition: color .2s ease; }
+  .footer-col a:hover{ color: var(--text-primary); }
+  .footer-bottom{ display: flex; align-items: center; justify-content: space-between; padding-top: 26px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-tertiary); flex-wrap: wrap; gap: 12px; }
+  .footer-legal{ display: flex; gap: 18px; }
+  .footer-legal a{ color: var(--text-tertiary); text-decoration: none; }
+  .footer-legal a:hover{ color: var(--text-secondary); }
+
+  /* ---------- Mega-menu: Soluciones ---------- */
+  .nav-item-drop{ position: relative; }
+  .mega-panel{
+    position: absolute; top: calc(100% + 16px); left: 50%; transform: translateX(-50%) translateY(6px);
+    width: 560px; background: rgba(19,31,54,0.92); backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 60;
+  }
+  .nav-item-drop:hover .mega-panel, .nav-item-drop.force-open .mega-panel{ opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+  .mega-grid{ display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; }
+  .mega-item{ display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: var(--radius-md); text-decoration: none; cursor: pointer; transition: background .15s ease; }
+  .mega-item:hover{ background: rgba(255,255,255,0.05); }
+  .mega-item .mod-badge{ width: 32px; height: 32px; font-size: 9.5px; }
+  .mega-item-text b{ display: block; font-size: 12.5px; color: var(--text-primary); font-weight: 600; }
+  .mega-item-text span{ font-size: 11px; color: var(--text-tertiary); }
+  .mega-foot{ display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .mega-foot span{ font-size: 12px; color: var(--text-tertiary); }
+  .mega-foot a{ font-size: 12.5px; font-weight: 700; color: var(--yellow); text-decoration: none; cursor: pointer; }
+
+  /* ---------- Mobile menu ---------- */
+  .hamburger{ display: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border-strong); background: rgba(255,255,255,0.02); align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .hamburger svg{ width: 16px; height: 16px; }
+  .mobile-panel{
+    display: none; position: fixed; inset: 0; z-index: 90; background: var(--bg);
+    padding: 22px 22px 40px; overflow-y: auto;
+  }
+  .mobile-panel.open{ display: block; }
+  .mobile-panel-top{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+  .mobile-close{ width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--border-strong); display: grid; place-items: center; cursor: pointer; }
+  .mobile-close svg{ width: 15px; height: 15px; }
+  .mobile-links{ display: flex; flex-direction: column; }
+  .mobile-links a{ padding: 15px 2px; border-bottom: 1px solid var(--border); color: var(--text-primary); text-decoration: none; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .mobile-sub{ padding-left: 14px; display: flex; flex-direction: column; }
+  .mobile-sub a{ font-size: 13.5px; font-weight: 500; color: var(--text-secondary); padding: 11px 2px; border-bottom: none; }
+  .mobile-cta-stack{ display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+  .mobile-cta-stack .btn{ width: 100%; }
+
+  /* ---------- Responsive additions ---------- */
+  @media (max-width: 1180px){
+    .module-showcase, .grid-3, .plans-grid, .resource-grid{ grid-template-columns: repeat(2,1fr); }
+    .steps-rail, .grid-4{ grid-template-columns: repeat(2,1fr); }
+    .form-shell{ grid-template-columns: 1fr; }
+    .sec-grid, .grid-2{ grid-template-columns: 1fr; }
+    .corp-hero{ grid-template-columns: 1fr; }
+    .footer-top{ grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 860px){
+    nav.links, .nav-right .mode-toggle, .nav-right .org-select, .nav-right .link-plain, .nav-right .btn-outline{ display: none; }
+    .hamburger{ display: flex; }
+    .module-showcase, .grid-3, .plans-grid, .resource-grid, .steps-rail, .grid-4{ grid-template-columns: 1fr; }
+    h2.section-title{ font-size: 26px; }
+    .page-section{ padding: 56px 0; }
+    .cta-band{ flex-direction: column; align-items: flex-start; }
+    .cta-band-actions{ width: 100%; }
+    .cta-band-actions .btn{ flex: 1; }
+    .footer-top{ grid-template-columns: 1fr; gap: 28px; }
+    .mega-panel{ position: static; transform: none; width: auto; opacity: 1; pointer-events: auto; display: none; box-shadow: none; border: none; background: transparent; backdrop-filter: none; padding: 4px 0 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mesh"><div class="blob blob-a"></div><div class="blob blob-b"></div></div>
+<div class="network">
+  <svg viewBox="0 0 900 1000" preserveAspectRatio="xMaxYMin meet">
+    <g stroke="rgba(247,201,72,0.18)" stroke-width="1">
+      <line x1="620" y1="140" x2="760" y2="230"/><line x1="760" y1="230" x2="700" y2="360"/>
+      <line x1="700" y1="360" x2="840" y2="420"/><line x1="620" y1="140" x2="540" y2="260"/>
+      <line x1="540" y1="260" x2="700" y2="360"/><line x1="840" y1="420" x2="780" y2="560"/>
+      <line x1="700" y1="360" x2="620" y2="480"/><line x1="620" y1="480" x2="780" y2="560"/>
+    </g>
+    <g fill="rgba(247,201,72,0.55)">
+      <circle cx="620" cy="140" r="3"/><circle cx="760" cy="230" r="2.5"/><circle cx="700" cy="360" r="4"/>
+      <circle cx="840" cy="420" r="2.5"/><circle cx="540" cy="260" r="2.5"/><circle cx="780" cy="560" r="3"/><circle cx="620" cy="480" r="2.5"/>
+    </g>
+  </svg>
+</div>
+<div class="grain"></div>
+
+<!-- =========================================================
+     NAVBAR — persistente en todas las páginas del prototipo
+     data-action documentado en el handoff para Codex
+     ========================================================= -->
+<div class="nav-shell">
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand" data-nav="inicio" onclick="goTo('inicio')" style="cursor:pointer">
+        <div class="brand-mark">
+          <svg viewBox="0 0 40 40" fill="none">
+            <path d="M20 2 L36 11 V29 L20 38 L4 29 V11 Z" fill="#f7c948"/>
+            <path d="M13 26 L20 13 L20 20 L27 20 L20 33 L20 26 Z" fill="#0d1a2e"/>
+          </svg>
+        </div>
+        <div class="brand-text">PROCESA <span class="sub">CLOUD</span></div>
+      </div>
+
+      <nav class="links">
+        <a data-nav="producto" onclick="goTo('producto')">Producto</a>
+        <div class="nav-item-drop" id="megaWrap">
+          <a onclick="toggleMega(event)">Módulos <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
+          <div class="mega-panel" id="megaPanel">
+            <div class="mega-grid">
+              <a class="mega-item" onclick="goTo('soluciones','pos')"><span class="mod-badge">POS</span><span class="mega-item-text"><b>Punto de venta</b><span>Ventas, caja e inventario</span></span></a>
+              <a class="mega-item" onclick="goTo('soluciones','rest')"><span class="mod-badge">REST</span><span class="mega-item-text"><b>Restaurantes</b><span>Mesas, comandas y cocina</span></span></a>
+              <a class="mega-item" onclick="goTo('soluciones','conta')"><span class="mod-badge">CTA</span><span class="mega-item-text"><b>Contabilidad</b><span>Comprobantes y reportes</span></span></a>
+              <a class="mega-item" onclick="goTo('soluciones','rrhh')"><span class="mod-badge">RH</span><span class="mega-item-text"><b>RRHH</b><span>Personal y asistencia</span></span></a>
+              <a class="mega-item" onclick="goTo('soluciones','docs')"><span class="mod-badge">DOC</span><span class="mega-item-text"><b>Documentos</b><span>Archivo y plantillas</span></span></a>
+              <a class="mega-item" onclick="goTo('soluciones','gymvet')"><span class="mod-badge">G·V</span><span class="mega-item-text"><b>Gimnasios y veterinarias</b><span>Membresías y clínica</span></span></a>
+            </div>
+            <div class="mega-foot">
+              <span>Una cuenta. Los módulos que actives.</span>
+              <a onclick="goTo('soluciones')">Ver todos los módulos →</a>
+            </div>
+          </div>
+        </div>
+        <a data-nav="como-funciona" onclick="goTo('como-funciona')">Cómo funciona</a>
+        <a data-nav="precios" onclick="goTo('precios')">Precios</a>
+        <a data-nav="seguridad" onclick="goTo('seguridad')">Seguridad</a>
+        <a data-nav="recursos" onclick="goTo('recursos')">Recursos</a>
+      </nav>
+
+      <div class="nav-right">
+        <div class="org-select" onclick="goTo('procesa-corp')">PROCESA CORP <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+        <a class="link-plain" onclick="goTo('iniciar-sesion')" data-action="login-link">Iniciar sesión</a>
+        <a class="btn btn-outline btn-sm" onclick="goTo('demo')" data-action="request-demo">Solicitar demo</a>
+        <a class="btn btn-yellow btn-sm" onclick="goTo('crear-cuenta')" data-action="signup-trial">Comenzar gratis <svg viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="hamburger" onclick="openMobile()"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<!-- Mobile full-screen menu -->
+<div class="mobile-panel" id="mobilePanel">
+  <div class="mobile-panel-top">
+    <div class="brand-text">PROCESA <span class="sub" style="color:var(--yellow)">CLOUD</span></div>
+    <div class="mobile-close" onclick="closeMobile()"><svg viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+  </div>
+  <div class="mobile-links">
+    <a onclick="goTo('inicio')">Inicio</a>
+    <a onclick="goTo('producto')">Producto</a>
+    <a onclick="goTo('soluciones')">Módulos</a>
+    <div class="mobile-sub">
+      <a onclick="goTo('soluciones','pos')">→ POS</a>
+      <a onclick="goTo('soluciones','rest')">→ REST</a>
+      <a onclick="goTo('soluciones','conta')">→ CONTA</a>
+      <a onclick="goTo('soluciones','rrhh')">→ RRHH</a>
+      <a onclick="goTo('soluciones','docs')">→ DOCS</a>
+      <a onclick="goTo('soluciones','gymvet')">→ GYM · VET</a>
+    </div>
+    <a onclick="goTo('como-funciona')">Cómo funciona</a>
+    <a onclick="goTo('precios')">Precios</a>
+    <a onclick="goTo('seguridad')">Seguridad</a>
+    <a onclick="goTo('recursos')">Recursos</a>
+    <a onclick="goTo('procesa-corp')">PROCESA CORP</a>
+  </div>
+  <div class="mobile-cta-stack">
+    <a class="btn btn-yellow btn-lg" onclick="goTo('crear-cuenta')">Comenzar gratis</a>
+    <a class="btn btn-outline btn-lg" onclick="goTo('demo')">Solicitar demo</a>
+    <a class="btn btn-outline btn-lg" onclick="goTo('iniciar-sesion')">Iniciar sesión</a>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- =========================================================
+       PÁGINA: INICIO
+       ========================================================= -->
+  <div class="page active" id="page-inicio">
+
+  <div class="modules-row reveal" style="animation-delay:.05s" id="segTabs">
+    <div class="seg-indicator"></div>
+    <div class="mtab active"><span class="dot"></span>POS <span class="tag">IA</span></div>
+    <div class="mtab"><span class="dot"></span>REST</div>
+    <div class="mtab"><span class="dot"></span>CONTA</div>
+    <div class="mtab"><span class="dot"></span>GYM</div>
+    <div class="mtab"><span class="dot"></span>VET</div>
+    <div class="mtab"><span class="dot"></span>RRHH</div>
+    <div class="mtab"><span class="dot"></span>DOCS</div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow-pill reveal" style="animation-delay:.1s"><span class="dot"></span>Ecosistema · Módulos · Tiempo real</div>
+
+      <h1 class="headline reveal" style="animation-delay:.15s">
+        Tu empresa.<br><span class="accent">Procesándose en tiempo real.</span>
+      </h1>
+
+      <p class="lede reveal" style="animation-delay:.2s">
+        Centraliza ventas, inventario, sucursales y control operativo en un solo ecosistema modular. <em>El futuro se procesa hoy.</em>
+      </p>
+
+      <div class="checklist reveal" style="animation-delay:.25s">
+        <span class="chip"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Ventas</span>
+        <span class="chip"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Sucursales</span>
+        <span class="chip"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Inventario</span>
+        <span class="chip"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Control</span>
+      </div>
+
+      <div class="cta-row reveal" style="animation-delay:.3s">
+        <a class="btn btn-yellow btn-lg" onclick="goTo('crear-cuenta')" data-action="signup-trial">Comenzar gratis <svg viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn btn-outline btn-lg" onclick="goTo('demo')" data-action="request-demo">Solicitar demo <svg viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+
+      <div class="trust-line reveal" style="animation-delay:.33s">Diseñado para <b>bodegas, minimarkets, farmacias y restaurantes</b> que necesitan control total de su operación diaria.</div>
+
+      <div class="foot-features reveal" style="animation-delay:.36s">
+        <span><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Multiempresa nativo</span>
+        <span><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Multisucursal</span>
+        <span><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Roles y permisos</span>
+        <span><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Auditoría operativa</span>
+      </div>
+    </div>
+
+    <div class="mock-perspective">
+    <div class="mock-wrap reveal" style="animation-delay:.2s" id="mockWrap">
+      <div class="mock-window" id="mockWindow">
+        <div class="mock-titlebar">
+          <div class="traffic"><i></i><i></i><i></i></div>
+          <div class="urlbar"><svg viewBox="0 0 12 12" fill="none"><rect x="2.5" y="5" width="7" height="5.5" rx="1" stroke="currentColor" stroke-width="1"/><path d="M4 5V3.5A2 2 0 0 1 8 3.5V5" stroke="currentColor" stroke-width="1"/></svg>app.procesacloud.com/pos</div>
+          <div class="live-tag"><span class="pulse-dot"></span>DEMO · TIEMPO REAL</div>
+        </div>
+
+        <div class="mock-body">
+          <div class="mock-sidebar">
+            <div class="avatar">PC</div>
+            <div class="sidenav-item active"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8L8 2L14 8M4 6.5V14H12V6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Inicio</div>
+            <div class="sidenav-item"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.4" stroke="currentColor" stroke-width="1.4"/><path d="M2 6.5H14" stroke="currentColor" stroke-width="1.4"/></svg>Operaciones</div>
+            <div class="sidenav-item"><svg viewBox="0 0 16 16" fill="none"><path d="M2 5L8 2L14 5V11L8 14L2 11Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Inventario</div>
+            <div class="sidenav-item"><svg viewBox="0 0 16 16" fill="none"><path d="M2 12L6 6L9.5 9L14 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Finanzas</div>
+            <div class="sidenav-item"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5.5H10.5M5.5 8H10.5M5.5 10.5H8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reportes</div>
+          </div>
+
+          <div class="mock-main">
+            <div class="mm-top">
+              <div class="mm-company"><span class="status-dot"></span><b>Corporación Los Cedros SAC</b><span>· Sede Principal</span></div>
+              <span class="pos-pill">POS</span>
+            </div>
+
+            <div class="env-label">Entorno demostrativo · Módulo en ejecución</div>
+            <div class="mm-title">Panel operativo</div>
+            <div class="mm-sub">Minimarket Los Cedros · Sede Principal</div>
+
+            <div class="module-grid">
+              <div class="module-card"><div class="m-ico pos">POS</div><div class="m-label">Punto de venta</div></div>
+              <div class="module-card"><div class="m-ico inv">INV</div><div class="m-label">Inventario</div></div>
+              <div class="module-card"><div class="m-ico fin">FIN</div><div class="m-label">Finanzas</div></div>
+              <div class="module-card"><div class="m-ico aud">AUD</div><div class="m-label">Auditoría</div></div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Ventas acumuladas hoy</div>
+                <div class="stat-value" id="ventasValue">S/ 0.00</div>
+                <div class="stat-delta">↑ 14.8% vs ayer</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Caja en turno</div>
+                <div class="stat-value">S/ 850.00</div>
+                <div class="stat-note">Inicial · Turno mañana</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Stock crítico</div>
+                <div class="stat-value" style="color:var(--red)">2 items</div>
+                <div class="stat-note">Por reponer</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Contexto y acceso</div>
+                <div class="stat-note" style="margin-top:2px">Empresa · Sucursal · Rol</div>
+              </div>
+            </div>
+
+            <div class="panels-row">
+              <div class="panel">
+                <div class="panel-head">
+                  <h4>Actividad operativa</h4>
+                  <span class="live-tag"><span class="pulse-dot green"></span>En vivo</span>
+                </div>
+                <div id="activityFeed">
+                  <div class="activity-row" data-ts="0"><span class="a-tag venta">VENTA</span><span class="a-text">Boleta B001-00249 · S/ 48.50 (Yape + Efectivo)</span><span class="a-time">hace 4s</span></div>
+                  <div class="activity-row" data-ts="0"><span class="a-tag stock">STOCK</span><span class="a-text">Arroz Extra 5kg actualizado a 24 unid.</span><span class="a-time">hace 18s</span></div>
+                  <div class="activity-row" data-ts="0"><span class="a-tag caja">CAJA</span><span class="a-text">Arqueo de turno validado por supervisor</span><span class="a-time">hace 42s</span></div>
+                </div>
+              </div>
+
+              <div class="panel ai-panel">
+                <div class="panel-head"><h4>Viernes · Asistente IA</h4></div>
+                <p>¿Qué necesita atención hoy? Consulta la operación según empresa, sucursal y permisos.</p>
+                <a onclick="goTo('soluciones','pos')">Explorar asistencia <svg viewBox="0 0 12 12" fill="none" width="10" height="10"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mm-footer">
+          <span>PROCESA Cloud · Ecosistema de PROCESA CORP</span>
+          <a onclick="goTo('soluciones')">Explorar catálogo <svg viewBox="0 0 12 12" fill="none" width="10" height="10"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+
+        <div class="fab"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L11.8 7.6L17 10L11.8 12.4L10 18L8.2 12.4L3 10L8.2 7.6Z" fill="currentColor"/></svg></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Soluciones destacadas -->
+  <section class="page-section">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Un ecosistema, no apps sueltas</div>
+      <h2 class="section-title">Una cuenta. Los módulos que tu negocio necesita.</h2>
+      <p class="section-lede">Activa POS, REST, CONTA, RRHH, DOCS y más desde la misma empresa, con los mismos usuarios, roles y datos de operación.</p>
+    </div>
+    <div class="grid-3">
+      <div class="info-card">
+        <div class="ico"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 8H17" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <h3 class="card-title">POS &amp; REST</h3>
+        <p>Ventas, caja, mesas y comandas para comercios y restaurantes, con reportes en tiempo real.</p>
+      </div>
+      <div class="info-card">
+        <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M3 15L7 8L11 11L17 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3 class="card-title">CONTA &amp; RRHH</h3>
+        <p>Comprobantes, reportes contables, personal y asistencia conectados a la operación diaria.</p>
+      </div>
+      <div class="info-card">
+        <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L11.8 7.6L17 10L11.8 12.4L10 18L8.2 12.4L3 10L8.2 7.6Z" fill="currentColor"/></svg></div>
+        <h3 class="card-title">Viernes · Asistente IA</h3>
+        <p>Consulta la operación en lenguaje natural, según empresa, sucursal y permisos de cada usuario.</p>
+      </div>
+    </div>
+    <div style="margin-top:26px"><a class="btn btn-outline" onclick="goTo('soluciones')">Ver todos los módulos <svg viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </section>
+
+  <!-- Cómo funciona (preview) -->
+  <section class="page-section">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Simple de empezar</div>
+      <h2 class="section-title">De crear tu cuenta a operar, en cuatro pasos.</h2>
+    </div>
+    <div class="steps-rail">
+      <div class="step-card"><div class="step-num">01</div><h3>Crea tu cuenta</h3><p>Registra tu empresa y define tu primer usuario administrador.</p></div>
+      <div class="step-card"><div class="step-num">02</div><h3>Configura sucursales</h3><p>Agrega sedes, roles y permisos según tu operación.</p></div>
+      <div class="step-card"><div class="step-num">03</div><h3>Activa módulos</h3><p>Elige POS, REST, CONTA u otros según lo que necesitas hoy.</p></div>
+      <div class="step-card"><div class="step-num">04</div><h3>Opera en tiempo real</h3><p>Ventas, stock y caja actualizados al instante, con Viernes disponible.</p></div>
+    </div>
+    <div style="margin-top:26px"><a class="btn btn-outline" onclick="goTo('como-funciona')">Ver el detalle completo <svg viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </section>
+
+  <!-- CTA band -->
+  <section class="page-section tight">
+    <div class="cta-band">
+      <div>
+        <h3>¿Listo para procesar tu operación en tiempo real?</h3>
+        <p>Empieza gratis o pide una demo con nuestro equipo comercial. Sin tarjeta, sin compromiso.</p>
+      </div>
+      <div class="cta-band-actions">
+        <a class="btn btn-outline btn-lg" onclick="goTo('demo')">Solicitar demo</a>
+        <a class="btn btn-yellow btn-lg" onclick="goTo('crear-cuenta')">Comenzar gratis</a>
+      </div>
+    </div>
+  </section>
+
+  </div>
+  <!-- fin PÁGINA INICIO -->
+
+  <!-- =========================================================
+       PÁGINA: PRODUCTO
+       ========================================================= -->
+  <div class="page" id="page-producto">
+    <section class="page-section page-hero">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Producto</span></div>
+      <div class="eyebrow reveal"><span class="dot"></span>Plataforma</div>
+      <h1 class="headline reveal" style="font-size:40px;max-width:720px">Un ecosistema modular para operar tu empresa <span class="accent">en tiempo real</span>.</h1>
+      <p class="lede reveal" style="max-width:620px">PROCESA Cloud centraliza ventas, inventario, sucursales, personal y documentos en una sola cuenta. Activas los módulos que tu operación necesita, cuando los necesitas.</p>
+      <div class="cta-row reveal">
+        <a class="btn btn-yellow btn-lg" onclick="goTo('crear-cuenta')">Comenzar gratis</a>
+        <a class="btn btn-outline btn-lg" onclick="goTo('demo')">Solicitar demo</a>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-head">
+        <div class="eyebrow"><span class="dot"></span>Capacidades base</div>
+        <h2 class="section-title">Lo que trae cada empresa, sin importar qué módulos active.</h2>
+      </div>
+      <div class="grid-4">
+        <div class="info-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="11" y="3" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="3" y="11" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="11" y="11" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/></svg></div>
+          <h3 class="card-title">Multiempresa nativo</h3>
+          <p>Administra varias razones sociales desde una sola cuenta, cada una con su propia información.</p>
+        </div>
+        <div class="info-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M3 17V9L10 4L17 9V17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3 class="card-title">Multisucursal</h3>
+          <p>Sedes independientes con su propio inventario, caja y equipo, visibles desde un panel central.</p>
+        </div>
+        <div class="info-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.2" stroke="currentColor" stroke-width="1.4"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <h3 class="card-title">Roles y permisos</h3>
+          <p>Define qué puede ver y hacer cada persona, por empresa, sucursal y módulo activo.</p>
+        </div>
+        <div class="info-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10H16M4 10L8 6M4 10L8 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3 class="card-title">Auditoría operativa</h3>
+          <p>Registro de acciones relevantes dentro del sistema, cuando el módulo lo contempla.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-head">
+        <div class="eyebrow"><span class="dot"></span>Una experiencia, un panel</div>
+        <h2 class="section-title">Cada módulo vive dentro del mismo panel operativo.</h2>
+        <p class="section-lede">Sin saltar entre sistemas ni volver a iniciar sesión. La navegación, los usuarios y el contexto de empresa y sucursal se mantienen al cambiar de módulo.</p>
+      </div>
+      <div class="grid-2">
+        <div class="info-card">
+          <h3 class="card-title">Contexto compartido</h3>
+          <p>Empresa, sucursal y rol activo se mantienen visibles y se aplican a cada módulo que actives.</p>
+        </div>
+        <div class="info-card">
+          <h3 class="card-title">Viernes, en cualquier módulo</h3>
+          <p>El asistente puede ayudarte a consultar información y navegar dentro de las áreas disponibles según tu plan.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section tight">
+      <div class="cta-band">
+        <div><h3>Explora los módulos disponibles</h3><p>Conoce en detalle qué resuelve cada uno y para qué tipo de negocio está pensado.</p></div>
+        <div class="cta-band-actions"><a class="btn btn-yellow btn-lg" onclick="goTo('soluciones')">Ver módulos</a></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: SOLUCIONES / MÓDULOS
+       ========================================================= -->
+  <div class="page" id="page-soluciones">
+    <section class="page-section page-hero">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Soluciones</span></div>
+      <div class="eyebrow"><span class="dot"></span>Módulos</div>
+      <h1 class="headline" style="font-size:38px;max-width:700px">Un módulo por cada parte de tu operación.</h1>
+      <p class="lede" style="max-width:600px">Activa solo lo que necesitas hoy y suma módulos a medida que tu negocio crece. Todos comparten empresa, sucursales y usuarios.</p>
+    </section>
+
+    <section class="page-section tight">
+      <div class="module-showcase">
+
+        <div class="mod-card" id="mod-pos" onclick="toggleMod('mod-pos')">
+          <div class="mod-card-top"><span class="mod-badge">POS</span><span class="mod-toggle">Ver detalle <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></div>
+          <h3 class="card-title">Punto de venta</h3>
+          <p class="mod-desc">Ventas, inventario, clientes, caja y reportes en una sola experiencia.</p>
+          <div class="mod-detail"><div class="mod-detail-inner">
+            <ul>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Caja rápida con contado y crédito</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Inventario, stock mínimo y alertas de reposición</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Clientes, créditos y abonos</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Apertura y cierre de caja</li>
+            </ul>
+            <div class="mod-for">Pensado para bodegas, minimarkets, farmacias y comercios.</div>
+          </div></div>
+        </div>
+
+        <div class="mod-card" id="mod-rest" onclick="toggleMod('mod-rest')">
+          <div class="mod-card-top"><span class="mod-badge">REST</span><span class="mod-toggle">Ver detalle <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></div>
+          <h3 class="card-title">Restaurantes</h3>
+          <p class="mod-desc">Mesas, comandas, cocina y caja pensados para el ritmo de un restaurante.</p>
+          <div class="mod-detail"><div class="mod-detail-inner">
+            <ul>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Mapa de mesas y estado de atención</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Comandas enviadas a cocina</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>División de cuentas y medios de pago</li>
+            </ul>
+            <div class="mod-for">Pensado para restaurantes, cevicherías y afines.</div>
+          </div></div>
+        </div>
+
+        <div class="mod-card" id="mod-conta" onclick="toggleMod('mod-conta')">
+          <div class="mod-card-top"><span class="mod-badge">CTA</span><span class="mod-toggle">Ver detalle <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></div>
+          <h3 class="card-title">Contabilidad</h3>
+          <p class="mod-desc">Comprobantes, libros y reportes contables conectados a tu operación diaria.</p>
+          <div class="mod-detail"><div class="mod-detail-inner">
+            <ul>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Emisión de comprobantes electrónicos*</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reportes contables por periodo</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Conciliación con ventas de POS/REST</li>
+            </ul>
+            <div class="mod-for">*Alcance final sujeto a integración con el ente regulador correspondiente.</div>
+          </div></div>
+        </div>
+
+        <div class="mod-card" id="mod-rrhh" onclick="toggleMod('mod-rrhh')">
+          <div class="mod-card-top"><span class="mod-badge">RH</span><span class="mod-toggle">Ver detalle <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></div>
+          <h3 class="card-title">RRHH</h3>
+          <p class="mod-desc">Personal, asistencia y planillas en un mismo lugar.</p>
+          <div class="mod-detail"><div class="mod-detail-inner">
+            <ul>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Registro de colaboradores por sucursal</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Control de asistencia</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reportes de planilla</li>
+            </ul>
+            <div class="mod-for">Pensado para equipos multisucursal.</div>
+          </div></div>
+        </div>
+
+        <div class="mod-card" id="mod-docs" onclick="toggleMod('mod-docs')">
+          <div class="mod-card-top"><span class="mod-badge">DOC</span><span class="mod-toggle">Ver detalle <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></div>
+          <h3 class="card-title">Documentos</h3>
+          <p class="mod-desc">Documentos, plantillas y archivo organizado por empresa.</p>
+          <div class="mod-detail"><div class="mod-detail-inner">
+            <ul>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Repositorio de documentos por empresa/sucursal</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Plantillas reutilizables</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Búsqueda y control de acceso</li>
+            </ul>
+            <div class="mod-for">Útil junto a CONTA y RRHH.</div>
+          </div></div>
+        </div>
+
+        <div class="mod-card" id="mod-gymvet" onclick="toggleMod('mod-gymvet')">
+          <div class="mod-card-top"><span class="mod-badge">G·V</span><span class="mod-toggle">Ver detalle <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></div>
+          <h3 class="card-title">Gimnasios &amp; veterinarias</h3>
+          <p class="mod-desc">Membresías, accesos e historias clínicas para negocios de servicio.</p>
+          <div class="mod-detail"><div class="mod-detail-inner">
+            <ul>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>GYM: membresías, asistencia y control de accesos</li>
+              <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>VET: historias clínicas, citas e inventario</li>
+            </ul>
+            <div class="mod-for">Dos módulos de vertical, activables por separado.</div>
+          </div></div>
+        </div>
+
+      </div>
+
+      <div class="ai-callout">
+        <div class="ai-ico"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L11.8 7.6L17 10L11.8 12.4L10 18L8.2 12.4L3 10L8.2 7.6Z" fill="currentColor"/></svg></div>
+        <div>
+          <h4>Viernes · Asistente IA integrado</h4>
+          <p>Disponible en los módulos y planes que lo incluyen. Permite consultar información del sistema en lenguaje natural — no administra el negocio ni toma decisiones por el usuario.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section tight">
+      <div class="cta-band">
+        <div><h3>¿No sabes qué módulos activar primero?</h3><p>Cuéntanos tu operación y te ayudamos a elegir la combinación adecuada.</p></div>
+        <div class="cta-band-actions"><a class="btn btn-outline btn-lg" onclick="goTo('demo')">Solicitar demo</a><a class="btn btn-yellow btn-lg" onclick="goTo('crear-cuenta')">Comenzar gratis</a></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: CÓMO FUNCIONA
+       ========================================================= -->
+  <div class="page" id="page-como-funciona">
+    <section class="page-section page-hero">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Cómo funciona</span></div>
+      <div class="eyebrow"><span class="dot"></span>Onboarding</div>
+      <h1 class="headline" style="font-size:38px;max-width:680px">De crear tu cuenta a operar en tiempo real.</h1>
+      <p class="lede" style="max-width:600px">Un recorrido simple, sin implementación compleja. Puedes empezar solo y sumar sucursales o módulos cuando lo necesites.</p>
+    </section>
+
+    <section class="page-section tight">
+      <div class="grid-2">
+        <div class="info-card">
+          <div class="step-num" style="margin-bottom:12px">01</div>
+          <h3 class="card-title">Crea tu cuenta</h3>
+          <p>Registra tu empresa con el nombre comercial, RUC (opcional en el trial) y tu correo. Defines el primer usuario administrador.</p>
+        </div>
+        <div class="info-card">
+          <div class="step-num" style="margin-bottom:12px">02</div>
+          <h3 class="card-title">Configura empresa y sucursales</h3>
+          <p>Agrega tus sedes, define roles y permisos, e invita a tu equipo con el acceso que corresponde a cada persona.</p>
+        </div>
+        <div class="info-card">
+          <div class="step-num" style="margin-bottom:12px">03</div>
+          <h3 class="card-title">Activa los módulos que necesitas</h3>
+          <p>Elige entre POS, REST, CONTA, RRHH, DOCS y los módulos de vertical (GYM, VET) según tu operación.</p>
+        </div>
+        <div class="info-card">
+          <div class="step-num" style="margin-bottom:12px">04</div>
+          <h3 class="card-title">Opera en tiempo real</h3>
+          <p>Ventas, stock, caja y reportes actualizados al instante. Viernes queda disponible para consultas, según tu plan.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-head">
+        <div class="eyebrow"><span class="dot"></span>Sin fricción</div>
+        <h2 class="section-title">Puedes empezar solo o con acompañamiento.</h2>
+      </div>
+      <div class="grid-2">
+        <div class="info-card">
+          <h3 class="card-title">Autoservicio</h3>
+          <p>Crea tu cuenta y configura tu operación por tu cuenta, a tu ritmo, sin necesidad de una reunión previa.</p>
+          <div style="margin-top:16px"><a class="btn btn-yellow" onclick="goTo('crear-cuenta')">Comenzar gratis</a></div>
+        </div>
+        <div class="info-card">
+          <h3 class="card-title">Con acompañamiento</h3>
+          <p>Solicita una demo y nuestro equipo comercial te ayuda a definir qué módulos y plan encajan con tu negocio.</p>
+          <div style="margin-top:16px"><a class="btn btn-outline" onclick="goTo('demo')">Solicitar demo</a></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: PRECIOS
+       ========================================================= -->
+  <div class="page" id="page-precios">
+    <section class="page-section page-hero">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Precios</span></div>
+      <div class="eyebrow"><span class="dot"></span>Planes</div>
+      <h1 class="headline" style="font-size:38px;max-width:680px">Un precio por módulo activo. Sin paquetes forzados.</h1>
+      <p class="lede price-toggle-note" style="max-width:600px">Precios referenciales en soles, por módulo activo y por sucursal. El monto final se confirma según módulos, sucursales y usuarios de tu operación.</p>
+    </section>
+
+    <section class="page-section tight">
+      <div class="plans-grid">
+        <div class="plan-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-for">Para un negocio con una sola sucursal</div>
+          <div class="plan-price">S/ 49<span>/módulo · mes</span></div>
+          <div class="plan-note">Facturación mensual · 1 sucursal incluida</div>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>1 módulo activo</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Hasta 3 usuarios</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reportes básicos</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Soporte por correo</li>
+          </ul>
+          <a class="btn btn-outline" onclick="goTo('crear-cuenta')">Comenzar gratis</a>
+        </div>
+
+        <div class="plan-card featured">
+          <div class="plan-tag">Más elegido</div>
+          <div class="plan-name">Business</div>
+          <div class="plan-for">Para negocios multisucursal</div>
+          <div class="plan-price">S/ 99<span>/módulo · mes</span></div>
+          <div class="plan-note">Facturación mensual · sucursales ilimitadas</div>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Módulos ilimitados</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Usuarios ilimitados</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Roles y permisos avanzados</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reportes avanzados y auditoría</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Soporte prioritario</li>
+          </ul>
+          <a class="btn btn-yellow" onclick="goTo('crear-cuenta')">Comenzar gratis</a>
+        </div>
+
+        <div class="plan-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-for">Para operaciones de mayor volumen</div>
+          <div class="plan-price custom">Personalizado</div>
+          <div class="plan-note">Cotización según módulos, sucursales y usuarios</div>
+          <ul class="plan-features">
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Todo lo de Business</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Viernes · Asistente IA</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Auditoría operativa completa</li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Acompañamiento comercial dedicado</li>
+          </ul>
+          <a class="btn btn-outline" onclick="goTo('demo')">Hablar con ventas</a>
+        </div>
+      </div>
+
+      <p class="price-disclaimer">Precios referenciales de este prototipo, en soles (S/), sujetos a confirmación comercial. No representan una lista de precios publicada ni vigente. El plan final depende de los módulos activados, el número de sucursales y usuarios de cada cuenta.</p>
+    </section>
+
+    <section class="page-section">
+      <div class="section-head">
+        <h2 class="section-title">Preguntas frecuentes sobre precios</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">¿Pago por módulo o por toda la plataforma? <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Pagas por cada módulo que actives (POS, REST, CONTA, etc.). No necesitas contratar módulos que no usas.</div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">¿Puedo cambiar de plan más adelante? <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Sí. Puedes subir de plan o activar nuevos módulos a medida que tu operación crece.</div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">¿Necesito tarjeta para el plan gratuito? <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">No. Puedes crear tu cuenta y probar la plataforma sin registrar un medio de pago.</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: SEGURIDAD
+       ========================================================= -->
+  <div class="page" id="page-seguridad">
+    <section class="page-section page-hero">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Seguridad</span></div>
+      <div class="eyebrow"><span class="dot"></span>Confianza</div>
+      <h1 class="headline" style="font-size:38px;max-width:680px">Cada empresa, con su propia información aislada.</h1>
+      <p class="lede" style="max-width:600px">El modelo multiempresa de PROCESA Cloud está diseñado para que los datos de cada cuenta permanezcan separados, con control de acceso por rol y sucursal.</p>
+    </section>
+
+    <section class="page-section tight">
+      <div class="sec-grid">
+        <div class="sec-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 9V6.5A3.5 3.5 0 0 1 13.5 6.5V9" stroke="currentColor" stroke-width="1.4"/></svg></div>
+          <div><h3>Aislamiento por empresa</h3><p>Cada cuenta accede únicamente a la información de su propia empresa y sucursales.</p></div>
+        </div>
+        <div class="sec-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.2" stroke="currentColor" stroke-width="1.4"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div><h3>Roles y permisos</h3><p>El acceso de cada usuario se define por rol, empresa, sucursal y módulo activo.</p></div>
+        </div>
+        <div class="sec-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10H16M4 10L8 6M4 10L8 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><h3>Auditoría operativa</h3><p>Registro de acciones relevantes dentro del sistema, disponible según el plan y módulo.</p></div>
+        </div>
+        <div class="sec-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L17 5V10C17 14 14 17 10 18C6 17 3 14 3 10V5L10 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+          <div><h3>Cifrado en tránsito</h3><p>Las conexiones a la plataforma se realizan mediante HTTPS.</p></div>
+        </div>
+        <div class="sec-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M4 4V16M4 4H16M4 10H14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><h3>Copias de respaldo</h3><p>La información operativa se respalda de forma periódica según el diseño de la plataforma.</p></div>
+        </div>
+        <div class="sec-card">
+          <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L11.8 7.6L17 10L11.8 12.4L10 18L8.2 12.4L3 10L8.2 7.6Z" fill="currentColor"/></svg></div>
+          <div><h3>Viernes, dentro de los permisos del usuario</h3><p>El asistente solo puede consultar información a la que el usuario que pregunta ya tiene acceso.</p></div>
+        </div>
+      </div>
+      <p class="price-disclaimer">PROCESA Cloud describe aquí el diseño general de su modelo de seguridad. No representa una certificación específica; el detalle técnico y contractual se confirma durante la evaluación comercial.</p>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: RECURSOS / AYUDA
+       ========================================================= -->
+  <div class="page" id="page-recursos">
+    <section class="page-section page-hero">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Recursos</span></div>
+      <div class="eyebrow"><span class="dot"></span>Ayuda</div>
+      <h1 class="headline" style="font-size:38px;max-width:680px">Todo lo que necesitas para operar sin trabas.</h1>
+    </section>
+
+    <section class="page-section tight">
+      <div class="resource-grid">
+        <a class="resource-card" onclick="goTo('recursos')">
+          <span class="tag-mini">Centro de ayuda</span>
+          <h3 class="card-title">Guías y artículos</h3>
+          <p>Explicaciones paso a paso de cada módulo, pensadas para el equipo que opera el día a día.</p>
+        </a>
+        <a class="resource-card" onclick="goTo('recursos')">
+          <span class="tag-mini">Soporte</span>
+          <h3 class="card-title">Contacta a soporte</h3>
+          <p>Escríbenos ante cualquier duda operativa o incidencia dentro de la plataforma.</p>
+        </a>
+        <a class="resource-card" onclick="goTo('recursos')">
+          <span class="tag-mini">Estado del servicio</span>
+          <h3 class="card-title">Disponibilidad de la plataforma</h3>
+          <p>Consulta el estado actual de PROCESA Cloud y sus módulos.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-head"><h2 class="section-title">Preguntas frecuentes</h2></div>
+      <div class="faq-list">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">¿Para qué tipo de negocios está pensado PROCESA Cloud? <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Está orientado a bodegas, minimarkets, farmacias, restaurantes y comercios que necesitan gestionar ventas, inventario, caja, personal y documentos, con opción de sumar más sucursales.</div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">¿Puedo usar solo un módulo? <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Sí. Activas únicamente los módulos que tu operación necesita y sumas otros cuando lo requieras.</div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">¿Qué es Viernes? <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Es el asistente virtual disponible en los planes que lo incluyen. Permite consultar información del sistema en lenguaje natural. No administra el negocio ni toma decisiones por el usuario.</div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">¿Qué diferencia hay entre PROCESA Cloud y PROCESA CORP? <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">PROCESA Cloud es la plataforma SaaS modular. PROCESA CORP es la consultora tecnológica que la construye, y también ofrece automatización RPA y software a medida.</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: PROCESA CORP (puente corporativo)
+       ========================================================= -->
+  <div class="page" id="page-procesa-corp">
+    <section class="page-section page-hero">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>PROCESA CORP</span></div>
+      <div class="corp-hero">
+        <div>
+          <div class="corp-mark"><svg viewBox="0 0 40 40" fill="none"><path d="M20 2 L36 11 V29 L20 38 L4 29 V11 Z" fill="#f7c948"/><path d="M13 26 L20 13 L20 20 L27 20 L20 33 L20 26 Z" fill="#0d1a2e"/></svg></div>
+          <div class="eyebrow"><span class="dot"></span>Empresa</div>
+          <h1 class="headline" style="font-size:34px">PROCESA Cloud es parte del ecosistema de PROCESA CORP.</h1>
+          <p class="lede">PROCESA CORP es la consultora tecnológica que construye PROCESA Cloud. Además, ofrece automatización de procesos (RPA) y desarrollo de software a medida para empresas que necesitan soluciones específicas.</p>
+          <div class="cta-row">
+            <a class="btn btn-yellow btn-lg" href="https://procesacorp.com" target="_blank" rel="noopener">Ir a procesacorp.com <svg viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+          <div class="corp-external-note">Este enlace lleva a un sitio distinto (procesacorp.com), con su propia identidad visual y navegación.</div>
+        </div>
+        <div class="corp-panel">
+          <h4>¿Qué encuentras en cada sitio?</h4>
+          <ul class="corp-list">
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>procesacloud.com</b> — la plataforma SaaS: módulos, precios, demo, crear cuenta e iniciar sesión.</span></li>
+            <li><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>procesacorp.com</b> — automatización RPA, software a medida, casos de uso y la consultora como empresa.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-head">
+        <div class="eyebrow"><span class="dot"></span>Trazabilidad de la migración</div>
+        <h2 class="section-title">Qué se quedó en PROCESA CORP y qué pasó a PROCESA Cloud.</h2>
+        <p class="section-lede">Basado en la revisión pública de procesacorp.com (inicio, PROCESA POS y Nosotros). El resto de subpáginas del sitio no fueron auditadas en este prototipo.</p>
+      </div>
+      <div class="grid-2">
+        <div class="info-card">
+          <h3 class="card-title">Se mantiene solo en PROCESA CORP</h3>
+          <p>Automatización RPA, Software a medida, Cómo trabajamos (metodología consultiva), Casos de uso, Tecnologías, Nosotros y el formulario de "Agenda una reunión".</p>
+        </div>
+        <div class="info-card">
+          <h3 class="card-title">Migró o se adaptó a PROCESA Cloud</h3>
+          <p>El producto PROCESA POS (funciones, planes Lite/Pro/Enterprise y el asistente Viernes) es la base del módulo POS y del resto del ecosistema modular. El formulario de contacto se adaptó a "Solicitar demo".</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: SOLICITAR DEMO
+       data-action="request-demo" → formulario comercial.
+       NO crea cuenta. NO cobra. Solo genera un lead comercial.
+       ========================================================= -->
+  <div class="page" id="page-demo">
+    <section class="page-section page-hero" style="padding-bottom:20px">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Solicitar demo</span></div>
+    </section>
+    <section class="page-section tight" style="padding-top:0">
+      <div class="form-shell">
+        <div class="form-side">
+          <div class="eyebrow"><span class="dot"></span>Demo comercial</div>
+          <h3>Conoce PROCESA Cloud funcionando en un negocio como el tuyo.</h3>
+          <p>Completa el formulario y nuestro equipo comercial te contacta para coordinar una demostración. No agenda una fecha automáticamente ni requiere crear una cuenta.</p>
+          <div class="demo-perks">
+            <div class="demo-perk"><div class="ico"><svg viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><b>Sin pago</b><span>La demo no requiere tarjeta ni compromiso comercial.</span></div></div>
+            <div class="demo-perk"><div class="ico"><svg viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><b>Sin cuenta obligatoria</b><span>Puedes ver la plataforma antes de registrarte.</span></div></div>
+            <div class="demo-perk"><div class="ico"><svg viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><b>A la medida</b><span>Vemos los módulos relevantes para tu tipo de negocio.</span></div></div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <form id="formDemo" data-action="request-demo" onsubmit="return handleDemoSubmit(event)">
+            <div class="field-row">
+              <div class="field"><label>Nombre y apellido <span class="req">*</span></label><input type="text" name="nombre" required placeholder="Tu nombre"></div>
+              <div class="field"><label>Empresa <span class="req">*</span></label><input type="text" name="empresa" required placeholder="Nombre de tu negocio"></div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>Correo <span class="req">*</span></label><input type="email" name="correo" required placeholder="tu@empresa.com"></div>
+              <div class="field"><label>Teléfono</label><input type="tel" name="telefono" placeholder="+51"></div>
+            </div>
+            <div class="field">
+              <label>Módulo de interés <span class="req">*</span></label>
+              <select name="modulo" required>
+                <option value="">Selecciona una opción</option>
+                <option>POS</option><option>REST</option><option>CONTA</option>
+                <option>RRHH</option><option>DOCS</option><option>GYM / VET</option>
+                <option>Aún no lo sé</option>
+              </select>
+            </div>
+            <div class="field"><label>¿Qué necesitas resolver?</label><textarea name="mensaje" placeholder="Cuéntanos brevemente tu operación"></textarea></div>
+            <label class="checkline"><input type="checkbox" required>He leído y acepto la <a onclick="event.stopPropagation()">Política de Privacidad</a>. <span class="req">*</span></label>
+            <button type="submit" class="btn btn-yellow btn-lg" style="width:100%">Solicitar demo <svg viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="form-submit-note">Enviar esta solicitud no agenda una fecha automáticamente. Nuestro equipo te contactará para coordinarla.</div>
+          </form>
+          <div class="form-success" id="demoSuccess">
+            <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10L8 14L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h4>Solicitud enviada (prototipo)</h4>
+            <p>En la versión final, esto crea un lead comercial y notifica al equipo de ventas. Ningún dato fue almacenado.</p>
+            <div style="margin-top:20px"><a class="btn btn-outline" onclick="goTo('inicio')">Volver al inicio</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: CREAR CUENTA
+       data-action="signup-trial" → registro / trial.
+       ========================================================= -->
+  <div class="page" id="page-crear-cuenta">
+    <section class="page-section page-hero" style="padding-bottom:20px">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Crear cuenta</span></div>
+    </section>
+    <section class="page-section tight" style="padding-top:0">
+      <div class="form-shell narrow">
+        <div class="form-card">
+          <div style="text-align:center;margin-bottom:22px">
+            <h3 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Crea tu cuenta gratis</h3>
+            <p style="font-size:13.5px;color:var(--text-secondary)">Sin tarjeta. Activa los módulos que necesites cuando quieras.</p>
+          </div>
+          <form id="formSignup" data-action="signup-trial" onsubmit="return handleSignupSubmit(event)">
+            <div class="field"><label>Nombre de la empresa <span class="req">*</span></label><input type="text" name="empresa" required placeholder="Ej. Minimarket Los Cedros"></div>
+            <div class="field"><label>RUC <span style="color:var(--text-tertiary);font-weight:500">(opcional en el trial)</span></label><input type="text" name="ruc" placeholder="11 dígitos"></div>
+            <div class="field"><label>Tu nombre <span class="req">*</span></label><input type="text" name="nombre" required placeholder="Nombre y apellido"></div>
+            <div class="field"><label>Correo <span class="req">*</span></label><input type="email" name="correo" required placeholder="tu@empresa.com"></div>
+            <div class="field"><label>Contraseña <span class="req">*</span></label><input type="password" name="password" required placeholder="Mínimo 8 caracteres"></div>
+            <label class="checkline"><input type="checkbox" required>Acepto los <a onclick="event.stopPropagation()">Términos</a> y la <a onclick="event.stopPropagation()">Política de Privacidad</a>. <span class="req">*</span></label>
+            <button type="submit" class="btn btn-yellow btn-lg" style="width:100%">Crear cuenta gratis</button>
+          </form>
+          <div class="form-success" id="signupSuccess">
+            <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10L8 14L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h4>Cuenta creada (prototipo)</h4>
+            <p>En la versión final, esto crearía la empresa, el usuario administrador y redirigiría al onboarding real (Supabase + multi-tenant). Aquí no se guarda ningún dato.</p>
+            <div style="margin-top:20px"><a class="btn btn-outline" onclick="goTo('inicio')">Volver al inicio</a></div>
+          </div>
+          <div class="form-alt-link">¿Ya tienes cuenta? <a onclick="goTo('iniciar-sesion')">Inicia sesión</a></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       PÁGINA: INICIAR SESIÓN
+       data-action="login" → usuarios existentes.
+       ========================================================= -->
+  <div class="page" id="page-iniciar-sesion">
+    <section class="page-section page-hero" style="padding-bottom:20px">
+      <div class="crumb-bar"><a onclick="goTo('inicio')">Inicio</a><svg viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Iniciar sesión</span></div>
+    </section>
+    <section class="page-section tight" style="padding-top:0">
+      <div class="form-shell narrow">
+        <div class="form-card">
+          <div style="text-align:center;margin-bottom:22px">
+            <h3 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Inicia sesión</h3>
+            <p style="font-size:13.5px;color:var(--text-secondary)">Accede al panel de tu empresa en PROCESA Cloud.</p>
+          </div>
+          <form id="formLogin" data-action="login" onsubmit="return handleLoginSubmit(event)">
+            <div class="field"><label>Correo <span class="req">*</span></label><input type="email" name="correo" required placeholder="tu@empresa.com"></div>
+            <div class="field"><label>Contraseña <span class="req">*</span></label><input type="password" name="password" required placeholder="Tu contraseña"></div>
+            <div style="text-align:right;margin-bottom:20px"><a style="font-size:12.5px;color:var(--text-secondary);text-decoration:none;cursor:pointer" data-action="password-reset">¿Olvidaste tu contraseña?</a></div>
+            <button type="submit" class="btn btn-yellow btn-lg" style="width:100%">Iniciar sesión</button>
+          </form>
+          <div class="form-success" id="loginSuccess">
+            <div class="ico"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10L8 14L16 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h4>Acceso simulado (prototipo)</h4>
+            <p>En la versión final, esto validaría credenciales contra el backend real y redirigiría a app.procesacloud.com. Aquí no hay autenticación real.</p>
+            <div style="margin-top:20px"><a class="btn btn-outline" onclick="goTo('inicio')">Volver al inicio</a></div>
+          </div>
+          <div class="form-alt-link">¿No tienes cuenta? <a onclick="goTo('crear-cuenta')">Crear cuenta gratis</a></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       FOOTER — presente en todas las páginas
+       ========================================================= -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="brand"><div class="brand-mark"><svg viewBox="0 0 40 40" fill="none"><path d="M20 2 L36 11 V29 L20 38 L4 29 V11 Z" fill="#f7c948"/><path d="M13 26 L20 13 L20 20 L27 20 L20 33 L20 26 Z" fill="#0d1a2e"/></svg></div><div class="brand-text">PROCESA <span class="sub">CLOUD</span></div></div>
+        <p>Ecosistema SaaS modular de PROCESA CORP para operar ventas, inventario, personal y documentos en tiempo real.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Producto</h5>
+        <ul>
+          <li><a onclick="goTo('producto')">Producto</a></li>
+          <li><a onclick="goTo('soluciones')">Módulos</a></li>
+          <li><a onclick="goTo('como-funciona')">Cómo funciona</a></li>
+          <li><a onclick="goTo('precios')">Precios</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Empresa</h5>
+        <ul>
+          <li><a onclick="goTo('seguridad')">Seguridad</a></li>
+          <li><a onclick="goTo('recursos')">Recursos y ayuda</a></li>
+          <li><a onclick="goTo('procesa-corp')">PROCESA CORP</a></li>
+          <li><a href="https://procesacorp.com" target="_blank" rel="noopener">procesacorp.com ↗</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Cuenta</h5>
+        <ul>
+          <li><a onclick="goTo('crear-cuenta')">Comenzar gratis</a></li>
+          <li><a onclick="goTo('demo')">Solicitar demo</a></li>
+          <li><a onclick="goTo('iniciar-sesion')">Iniciar sesión</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contacto</h5>
+        <ul>
+          <li><a onclick="goTo('recursos')">Centro de ayuda</a></li>
+          <li><a onclick="goTo('recursos')">Soporte</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 PROCESA CORP S.A.C. · PROCESA Cloud es parte de su ecosistema.</span>
+      <div class="footer-legal">
+        <a href="https://procesacorp.com/privacidad/" target="_blank" rel="noopener">Privacidad</a>
+        <a href="https://procesacorp.com/terminos/" target="_blank" rel="noopener">Términos</a>
+        <a href="https://procesacorp.com/cookies/" target="_blank" rel="noopener">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============ PAGE ROUTER (simulated navigation) ============ */
+  window.goTo = function(pageId, anchor){
+    var pages = document.querySelectorAll('.page');
+    pages.forEach(function(p){ p.classList.remove('active'); });
+    var target = document.getElementById('page-' + pageId);
+    if(target){ target.classList.add('active'); }
+
+    var navLinks = document.querySelectorAll('nav.links a[data-nav]');
+    navLinks.forEach(function(l){ l.classList.toggle('active', l.dataset.nav === pageId); });
+
+    closeMobile();
+    document.getElementById('megaPanel') && document.getElementById('megaPanel').parentElement.classList.remove('force-open');
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+
+    if(pageId === 'soluciones' && anchor){
+      setTimeout(function(){
+        var card = document.getElementById('mod-' + anchor);
+        if(card){
+          document.querySelectorAll('.mod-card').forEach(function(c){ c.classList.remove('open'); });
+          card.classList.add('open');
+          card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        }
+      }, 150);
+    }
+  };
+
+  /* ============ Mega menu (Módulos) ============ */
+  window.toggleMega = function(e){
+    e.preventDefault(); e.stopPropagation();
+    document.getElementById('megaWrap').classList.toggle('force-open');
+  };
+  document.addEventListener('click', function(e){
+    var wrap = document.getElementById('megaWrap');
+    if(wrap && !wrap.contains(e.target)) wrap.classList.remove('force-open');
+  });
+
+  /* ============ Mobile menu ============ */
+  window.openMobile = function(){ document.getElementById('mobilePanel').classList.add('open'); };
+  window.closeMobile = function(){ var m = document.getElementById('mobilePanel'); if(m) m.classList.remove('open'); };
+
+  /* ============ Module accordion (Soluciones) ============ */
+  window.toggleMod = function(id){
+    var card = document.getElementById(id);
+    var wasOpen = card.classList.contains('open');
+    document.querySelectorAll('.mod-card').forEach(function(c){ c.classList.remove('open'); });
+    if(!wasOpen) card.classList.add('open');
+  };
+
+  /* ============ FAQ accordion ============ */
+  window.toggleFaq = function(el){
+    var wasOpen = el.classList.contains('open');
+    el.parentElement.querySelectorAll('.faq-item').forEach(function(f){ f.classList.remove('open'); });
+    if(!wasOpen) el.classList.add('open');
+  };
+
+  /* ============ Form handlers (prototype — no backend) ============ */
+  window.handleDemoSubmit = function(e){
+    e.preventDefault();
+    document.getElementById('formDemo').style.display = 'none';
+    document.getElementById('demoSuccess').classList.add('show');
+    return false;
+  };
+  window.handleSignupSubmit = function(e){
+    e.preventDefault();
+    document.getElementById('formSignup').style.display = 'none';
+    document.getElementById('signupSuccess').classList.add('show');
+    return false;
+  };
+  window.handleLoginSubmit = function(e){
+    e.preventDefault();
+    document.getElementById('formLogin').style.display = 'none';
+    document.getElementById('loginSuccess').classList.add('show');
+    return false;
+  };
+
+  /* ============ Sliding segmented control (Inicio) ============ */
+  var seg = document.getElementById('segTabs');
+  var indicator = seg.querySelector('.seg-indicator');
+  var tabs = Array.prototype.slice.call(seg.querySelectorAll('.mtab'));
+
+  function moveIndicator(el){
+    indicator.style.width = el.offsetWidth + 'px';
+    indicator.style.transform = 'translateX(' + el.offsetLeft + 'px)';
+  }
+  function setActive(el){
+    tabs.forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+    moveIndicator(el);
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ setActive(t); }); });
+  window.addEventListener('load', function(){ moveIndicator(seg.querySelector('.mtab.active')); });
+  window.addEventListener('resize', function(){ moveIndicator(seg.querySelector('.mtab.active')); });
+
+  /* ============ 3D tilt on the product mockup ============ */
+  var wrap = document.getElementById('mockWrap');
+  var win = document.getElementById('mockWindow');
+  if(wrap && win && !reduceMotion && window.innerWidth > 1180){
+    wrap.addEventListener('mousemove', function(e){
+      var r = wrap.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      win.style.transform = 'perspective(1600px) rotateY(' + (px * 5) + 'deg) rotateX(' + (-py * 5) + 'deg)';
+    });
+    wrap.addEventListener('mouseleave', function(){
+      win.style.transform = 'perspective(1600px) rotateY(0deg) rotateX(0deg)';
+    });
+  }
+
+  /* ============ Live counter + activity feed simulation ============ */
+  var total = 3428.50;
+  var valueEl = document.getElementById('ventasValue');
+  var feedEl = document.getElementById('activityFeed');
+
+  function formatSoles(n){
+    return 'S/ ' + n.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function animateValue(from, to, duration){
+    var start = performance.now();
+    function tick(now){
+      var p = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var current = from + (to - from) * eased;
+      valueEl.textContent = formatSoles(current);
+      if(p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  if(valueEl){
+    if(reduceMotion){ valueEl.textContent = formatSoles(total); }
+    else{ animateValue(0, total, 1300); }
+  }
+
+  var products = ['Arroz Extra 5kg','Aceite Primor 1L','Leche Gloria lata','Coca-Cola 1.5L','Pan de molde Bimbo','Detergente Bolívar','Cerveza Cristal 6-pack'];
+  var payments = ['Yape','Efectivo','Yape + Efectivo','Plin','Tarjeta'];
+
+  function relTime(sec){
+    if(sec < 60) return 'hace ' + sec + 's';
+    return 'hace ' + Math.floor(sec/60) + 'm';
+  }
+
+  var seedTimes = [4, 18, 42];
+  if(feedEl){
+    Array.prototype.slice.call(feedEl.children).forEach(function(row, i){
+      row.dataset.ts = Date.now() - (seedTimes[i] || 0) * 1000;
+    });
+  }
+
+  function pushActivity(){
+    if(!feedEl) return;
+    var isVenta = Math.random() < 0.6;
+    var row = document.createElement('div');
+    row.className = 'activity-row entering';
+    row.dataset.ts = Date.now();
+
+    if(isVenta){
+      var amount = (Math.random() * 70 + 10).toFixed(2);
+      var prevTotal = total;
+      total += parseFloat(amount);
+      row.innerHTML = '<span class="a-tag venta">VENTA</span><span class="a-text">Boleta emitida · S/ ' + amount + ' (' + payments[Math.floor(Math.random()*payments.length)] + ')</span><span class="a-time">hace 0s</span>';
+      if(valueEl){
+        if(reduceMotion){ valueEl.textContent = formatSoles(total); }
+        else{
+          animateValue(prevTotal, total, 600);
+          valueEl.classList.add('flash');
+          setTimeout(function(){ valueEl.classList.remove('flash'); }, 700);
+        }
+      }
+    } else {
+      var stock = Math.floor(Math.random() * 30 + 5);
+      row.innerHTML = '<span class="a-tag stock">STOCK</span><span class="a-text">' + products[Math.floor(Math.random()*products.length)] + ' actualizado a ' + stock + ' unid.</span><span class="a-time">hace 0s</span>';
+    }
+
+    feedEl.prepend(row);
+    requestAnimationFrame(function(){ row.classList.add('entered'); });
+
+    while(feedEl.children.length > 3){
+      feedEl.removeChild(feedEl.lastElementChild);
+    }
+  }
+
+  if(!reduceMotion && feedEl){
+    setInterval(pushActivity, 3800);
+  }
+
+  setInterval(function(){
+    if(!feedEl) return;
+    var rows = feedEl.querySelectorAll('.activity-row');
+    rows.forEach(function(r){
+      var ts = parseInt(r.dataset.ts || Date.now(), 10);
+      var sec = Math.floor((Date.now() - ts) / 1000);
+      var timeEl = r.querySelector('.a-time');
+      if(timeEl) timeEl.textContent = relTime(sec);
+    });
+  }, 1000);
+})();
+</script>
+
+</body>
+</html>

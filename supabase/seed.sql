@@ -1,0 +1,2 @@
+-- Intentionally empty. Security tests create deterministic fixtures inside
+-- transactions and roll them back; CI must not depend on environment data.

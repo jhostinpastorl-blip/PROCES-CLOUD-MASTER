@@ -7,6 +7,7 @@ import { requirePermission } from "@/lib/auth/permissions";
 import { audit } from "@/lib/audit/log";
 import { assertBranchLimit } from "@/lib/plans/limits";
 import { assertCompanyOperable } from "@/lib/plans/limits";
+import { parseBranchActiveState } from "@/lib/branches/contracts";
 
 const createSchema = z.object({
   companyId: z.string().uuid(),
@@ -74,7 +75,7 @@ export async function updateBranch(f: FormData) {
 export async function toggleBranchStatus(f: FormData) {
   const companyId = z.string().uuid().parse(f.get("companyId"));
   const branchId = z.string().uuid().parse(f.get("branchId"));
-  const enable = String(f.get("enable")) === "true";
+  const enable = parseBranchActiveState(f.get("enable"));
   await requirePermission(companyId, "branches.manage");
   if (enable) await assertBranchLimit(companyId);
   const s = await createClient();
